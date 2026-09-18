@@ -176,3 +176,21 @@ export const selectOperationsViewModel = createSelector(
     };
   },
 );
+
+export interface OperationsAnalyticsData {
+  readonly trend: PlantOverview['trend'];
+  readonly productionByHour: PlantOverview['productionByHour'];
+  readonly downtimeByReason: PlantOverview['downtimeByReason'];
+}
+
+export const selectOperationsAnalyticsData = createSelector(
+  selectOperationsState,
+  (state): OperationsAnalyticsData | null =>
+    state?.data
+      ? {
+          trend: state.data.trend,
+          productionByHour: state.data.productionByHour,
+          downtimeByReason: state.data.downtimeByReason,
+        }
+      : null,
+);

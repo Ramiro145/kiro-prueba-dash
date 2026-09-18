@@ -116,6 +116,14 @@ export const NORTH_PLANT_OVERVIEW: PlantOverview = {
     { timestamp: '2026-09-18T11:00:00.000Z', actual: 0.78, target: 0.85 },
     { timestamp: UPDATED_AT, actual: 0.78, target: 0.85 },
   ],
+  productionByHour: [
+    { timestamp: '2026-09-18T07:00:00.000Z', actualUnits: 220, targetUnits: 300 },
+    { timestamp: '2026-09-18T08:00:00.000Z', actualUnits: 245, targetUnits: 300 },
+    { timestamp: '2026-09-18T09:00:00.000Z', actualUnits: 260, targetUnits: 300 },
+    { timestamp: '2026-09-18T10:00:00.000Z', actualUnits: 275, targetUnits: 300 },
+    { timestamp: '2026-09-18T11:00:00.000Z', actualUnits: 280, targetUnits: 325 },
+    { timestamp: UPDATED_AT, actualUnits: 282, targetUnits: 325 },
+  ],
   downtimeByReason: [
     { reason: 'Ajuste de soldadura', durationMinutes: 58 },
     { reason: 'Cambio de herramienta', durationMinutes: 34 },

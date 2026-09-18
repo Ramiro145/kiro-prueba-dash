@@ -1,0 +1,25 @@
+<section class="analytics" aria-label="Análisis del turno">
+  <article class="analytics-panel">
+    <header>
+      <p>{{ models().oee.eyebrow }}</p>
+      <h2>{{ models().oee.title }}</h2>
+    </header>
+    <app-echart [option]="models().oee.option" [summary]="models().oee.summary" />
+  </article>
+
+  <article class="analytics-panel">
+    <header>
+      <p>{{ models().production.eyebrow }}</p>
+      <h2>{{ models().production.title }}</h2>
+    </header>
+    <app-echart [option]="models().production.option" [summary]="models().production.summary" />
+  </article>
+
+  <article class="analytics-panel analytics-panel--wide">
+    <header>
+      <p>{{ models().downtime.eyebrow }}</p>
+      <h2>{{ models().downtime.title }}</h2>
+    </header>
+    <app-echart [option]="models().downtime.option" [summary]="models().downtime.summary" />
+  </article>
+</section>

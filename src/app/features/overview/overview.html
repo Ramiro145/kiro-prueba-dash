@@ -73,5 +73,11 @@
         }
       </ol>
     </section>
+
+    @defer (when chartModels()) {
+      @if (chartModels(); as charts) {
+        <app-overview-analytics [models]="charts" />
+      }
+    }
   }
 </main>

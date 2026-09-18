@@ -54,6 +54,12 @@ export interface TrendPoint {
   readonly target: number | null;
 }
 
+export interface HourlyProductionPoint {
+  readonly timestamp: string;
+  readonly actualUnits: number | null;
+  readonly targetUnits: number | null;
+}
+
 export interface DowntimeEvent {
   readonly id: string;
   readonly lineId: string;
@@ -86,6 +92,7 @@ export interface PlantOverview {
   readonly metrics: OeeMetrics;
   readonly snapshot: PlantProductionSnapshot;
   readonly trend: readonly TrendPoint[];
+  readonly productionByHour: readonly HourlyProductionPoint[];
   readonly downtimeByReason: readonly DowntimeReasonTotal[];
   readonly qualityDefects: readonly QualityDefect[];
   readonly activeAlertCount: number;
