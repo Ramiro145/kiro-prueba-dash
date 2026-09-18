@@ -1,0 +1,80 @@
+<a class="skip-link" href="#main-content">Saltar al contenido principal</a>
+
+<div
+  class="shell"
+  [class.shell--collapsed]="preferences().navigationCollapsed"
+  [class.shell--compact]="preferences().density === 'compact'"
+>
+  <aside class="shell__sidebar" aria-label="Navegación de operaciones">
+    <div class="brand">
+      <span class="brand__mark" aria-hidden="true">AC</span>
+      <span class="brand__copy">
+        <strong>Acero Control</strong>
+        <small>Operación industrial</small>
+      </span>
+    </div>
+
+    <button
+      class="navigation-toggle"
+      type="button"
+      data-testid="navigation-toggle"
+      [attr.aria-expanded]="!preferences().navigationCollapsed"
+      [attr.aria-label]="
+        preferences().navigationCollapsed ? 'Expandir navegación' : 'Contraer navegación'
+      "
+      (click)="toggleNavigation()"
+    >
+      <span class="navigation-toggle__glyph" aria-hidden="true"></span>
+    </button>
+
+    <nav class="navigation" aria-label="Principal">
+      <a
+        routerLink="/overview"
+        routerLinkActive="navigation__link--active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        title="Resumen"
+      >
+        <span class="navigation__glyph navigation__glyph--overview" aria-hidden="true"></span>
+        <span class="navigation__label">Resumen</span>
+      </a>
+      <a
+        routerLink="/lines/cutting-01"
+        routerLinkActive="navigation__link--active"
+        title="Detalle de línea"
+      >
+        <span class="navigation__glyph navigation__glyph--line" aria-hidden="true"></span>
+        <span class="navigation__label">Detalle de línea</span>
+      </a>
+      <a routerLink="/alerts" routerLinkActive="navigation__link--active" title="Alertas">
+        <span class="navigation__glyph navigation__glyph--alerts" aria-hidden="true"></span>
+        <span class="navigation__label">Alertas</span>
+      </a>
+    </nav>
+
+    <div class="system-state" role="status">
+      <span class="system-state__indicator" aria-hidden="true"></span>
+      <span class="system-state__copy">
+        <strong>Sistema operativo</strong>
+        <small>Mock API preparada</small>
+      </span>
+    </div>
+  </aside>
+
+  <section class="shell__workspace">
+    <header class="topbar">
+      <div class="topbar__context">
+        <span>Control de planta</span>
+        <strong>Operación en turno</strong>
+      </div>
+      <div class="topbar__metadata" aria-label="Contexto operativo">
+        <span><small>Planta</small> Norte</span>
+        <span><small>Turno</small> Mañana</span>
+        <span class="topbar__live"><i aria-hidden="true"></i> Lectura preparada</span>
+      </div>
+    </header>
+
+    <main id="main-content" class="shell__content" tabindex="-1">
+      <router-outlet />
+    </main>
+  </section>
+</div>

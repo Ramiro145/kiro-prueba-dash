@@ -1,0 +1,25 @@
+<main class="overview">
+  <header class="overview__header">
+    <p class="overview__eyebrow">Planta de transformación de acero</p>
+    <h1>Resumen de planta</h1>
+    <p class="overview__description">
+      Base técnica preparada para integrar supervisión OEE, producción, calidad y alertas.
+    </p>
+  </header>
+
+  <section class="process" aria-labelledby="process-title">
+    <div>
+      <p class="process__label">Flujo productivo</p>
+      <h2 id="process-title">Líneas del proceso</h2>
+    </div>
+
+    <ol class="process__stages">
+      @for (stage of stages; track stage.code) {
+        <li class="process__stage">
+          <span class="process__code" aria-hidden="true">{{ stage.code }}</span>
+          <span>{{ stage.name }}</span>
+        </li>
+      }
+    </ol>
+  </section>
+</main>

@@ -1,0 +1,73 @@
+@import '@fontsource/ibm-plex-sans/400.css';
+@import '@fontsource/ibm-plex-sans/600.css';
+@import '@fontsource/ibm-plex-sans/700.css';
+@import '@fontsource/ibm-plex-sans-condensed/600.css';
+@import '@fontsource/ibm-plex-sans-condensed/700.css';
+
+:root {
+  --color-steel: #e3e8eb;
+  --color-graphite: #182227;
+  --color-process: #126782;
+  --color-stable: #2f7d62;
+  --color-warning: #c77a10;
+  --color-fault: #b33b3b;
+  --color-surface: #f7f9fa;
+  --color-border: #a9b5bb;
+  --color-muted: #52636b;
+  --font-body: 'IBM Plex Sans', 'Segoe UI', sans-serif;
+  --font-display: 'IBM Plex Sans Condensed', 'Arial Narrow', sans-serif;
+  --motion-standard: 180ms ease;
+  color-scheme: light;
+  font-family: var(--font-body);
+  font-synthesis: none;
+  background: var(--color-steel);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 20rem;
+  min-height: 100%;
+  background: var(--color-steel);
+}
+
+body {
+  min-height: 100dvh;
+  margin: 0;
+  color: var(--color-graphite);
+  background: var(--color-steel);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+:focus-visible {
+  outline: 0.2rem solid var(--color-process);
+  outline-offset: 0.2rem;
+}
+
+::selection {
+  color: #ffffff;
+  background: var(--color-process);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
