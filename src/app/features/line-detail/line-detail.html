@@ -1,9 +1,170 @@
-<section class="workspace-placeholder" aria-labelledby="line-detail-title">
-  <p class="workspace-placeholder__eyebrow">Investigación operativa</p>
-  <h1 id="line-detail-title">Detalle de línea</h1>
-  <p>Las métricas, eventos y paros de línea se incorporarán en el incremento de detalle.</p>
-  <div class="workspace-placeholder__status">
-    <span aria-hidden="true">07</span>
-    <strong>Task 7 preparada</strong>
-  </div>
-</section>
+<main class="line-detail">
+  <a
+    class="line-detail__back"
+    data-testid="back-to-overview"
+    routerLink="/overview"
+    [queryParams]="backQueryParams()"
+  >
+    <span aria-hidden="true">←</span> Volver al resumen
+  </a>
+
+  @if (viewModel().status === 'loading' || viewModel().status === 'idle') {
+    <section class="detail-state" role="status" aria-live="polite">
+      <span class="detail-state__signal" aria-hidden="true"></span>
+      <div>
+        <strong>Cargando detalle de línea</strong>
+        <p>Consultando métricas, paros y eventos del turno…</p>
+      </div>
+    </section>
+  } @else if (viewModel().status === 'notFound') {
+    <section class="detail-state detail-state--error" role="alert">
+      <span class="detail-state__code" aria-hidden="true">404</span>
+      <div>
+        <h1>Línea no encontrada</h1>
+        <p>{{ viewModel().error }}</p>
+        <p>Comprueba el identificador o vuelve al resumen de planta.</p>
+      </div>
+    </section>
+  } @else if (viewModel().status === 'error') {
+    <section class="detail-state detail-state--error" role="alert">
+      <span class="detail-state__code" aria-hidden="true">!</span>
+      <div>
+        <h1>No se pudo cargar la línea</h1>
+        <p>{{ viewModel().error }}</p>
+        <button type="button" (click)="retry()">Reintentar consulta</button>
+      </div>
+    </section>
+  } @else {
+    <header class="line-header">
+      <div>
+        <p class="line-header__eyebrow">{{ viewModel().stageName }} · Investigación operativa</p>
+        <h1>{{ viewModel().lineName }}</h1>
+        <div class="line-header__metadata">
+          <span
+            >Orden <strong>{{ viewModel().activeOrder ?? 'Sin orden activa' }}</strong></span
+          >
+          <span>{{ viewModel().shiftName }}</span>
+          <span>
+            Lectura
+            <time [attr.datetime]="viewModel().updatedAt">
+              {{ viewModel().updatedAt | date: 'HH:mm:ss' }}
+            </time>
+          </span>
+        </div>
+      </div>
+      <span class="line-status" [attr.data-status]="viewModel().lineStatus" role="status">
+        <i aria-hidden="true"></i>{{ viewModel().statusLabel }}
+      </span>
+    </header>
+
+    <app-kpi-band [items]="viewModel().kpis" />
+
+    <section class="detail-grid" aria-label="Información operativa de línea">
+      <article class="detail-panel detail-panel--production">
+        <header>
+          <p>Ritmo de línea</p>
+          <h2>Producción por hora</h2>
+        </header>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Hora</th>
+                <th>Real</th>
+                <th>Meta</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (point of viewModel().productionByHour; track point.hour) {
+                <tr>
+                  <th>{{ point.hour }}</th>
+                  <td>{{ point.actual }}</td>
+                  <td>{{ point.target }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="detail-panel">
+        <header>
+          <p>Secuencia del turno</p>
+          <h2>Estado de línea</h2>
+        </header>
+        <ol class="status-timeline">
+          @for (interval of viewModel().statusTimeline; track interval.startedAt) {
+            <li [attr.data-status]="interval.status">
+              <i aria-hidden="true"></i>
+              <span
+                ><strong>{{ interval.statusLabel }}</strong
+                ><small>{{ interval.startedAt }}–{{ interval.endedAt }}</small></span
+              >
+            </li>
+          }
+        </ol>
+      </article>
+
+      <article class="detail-panel">
+        <header>
+          <p>Pérdidas operativas</p>
+          <h2>Paros</h2>
+        </header>
+        @if (viewModel().downtimeEvents.length) {
+          <ul class="record-list">
+            @for (event of viewModel().downtimeEvents; track event.id) {
+              <li>
+                <span
+                  ><strong>{{ event.reason }}</strong
+                  ><small>Desde {{ event.startedAt }}</small></span
+                ><b>{{ event.durationLabel }}</b>
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="panel-empty">Sin paros registrados en el turno.</p>
+        }
+      </article>
+
+      <article class="detail-panel">
+        <header>
+          <p>Conformidad</p>
+          <h2>Calidad</h2>
+        </header>
+        @if (viewModel().qualityDefects.length) {
+          <ul class="record-list">
+            @for (defect of viewModel().qualityDefects; track defect.category) {
+              <li>
+                <span
+                  ><strong>{{ defect.category }}</strong
+                  ><small>{{ defect.count }} unidades</small></span
+                ><b>{{ defect.percentageLabel }}</b>
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="panel-empty">Sin defectos clasificados.</p>
+        }
+      </article>
+
+      <article class="detail-panel detail-panel--history">
+        <header>
+          <p>Trazabilidad</p>
+          <h2>Historial reciente</h2>
+        </header>
+        @if (viewModel().events.length) {
+          <ol class="event-list">
+            @for (event of viewModel().events; track event.id) {
+              <li>
+                <time>{{ event.timestamp }}</time
+                ><span>{{ event.message }}</span>
+              </li>
+            }
+          </ol>
+        } @else {
+          <p class="panel-empty">Sin eventos recientes.</p>
+        }
+      </article>
+    </section>
+  }
+</main>

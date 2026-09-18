@@ -7,6 +7,11 @@ import { provideStore } from '@ngrx/store';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
 import { routes } from './app.routes';
 import { mockApiInterceptor } from './core/mock-api/mock-api.interceptor';
+import { LineDetailEffects } from './domains/operations/state/line-detail.effects';
+import {
+  LINE_DETAIL_FEATURE_KEY,
+  lineDetailReducer,
+} from './domains/operations/state/line-detail.reducer';
 import { OperationsEffects } from './domains/operations/state/operations.effects';
 import { OverviewLifecycleEffects } from './domains/operations/state/overview-lifecycle.effects';
 import {
@@ -28,9 +33,15 @@ export const appConfig: ApplicationConfig = {
     provideStore({
       router: routerReducer,
       [OPERATIONS_FEATURE_KEY]: operationsReducer,
+      [LINE_DETAIL_FEATURE_KEY]: lineDetailReducer,
       [PREFERENCES_FEATURE_KEY]: preferencesReducer,
     }),
-    provideEffects(OperationsEffects, OverviewLifecycleEffects, PreferencesEffects),
+    provideEffects(
+      OperationsEffects,
+      OverviewLifecycleEffects,
+      LineDetailEffects,
+      PreferencesEffects,
+    ),
     provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),
   ],
 };

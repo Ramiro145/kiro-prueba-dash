@@ -9,6 +9,7 @@ import {
 import { inject, InjectionToken } from '@angular/core';
 import { delay, Observable, of, throwError } from 'rxjs';
 import { Shift } from '../../domains/operations/models/operations.models';
+import { createLineDetailFixture } from './line-detail.fixtures';
 import { NORTH_PLANT_OVERVIEW, PLANTS } from './operations.fixtures';
 
 export const MOCK_API_LATENCY = new InjectionToken<number>('MOCK_API_LATENCY', {
@@ -55,6 +56,20 @@ export const mockApiInterceptor: HttpInterceptorFn = (
           url: request.urlWithParams,
         }),
       ).pipe(delay(latency));
+    }
+  }
+
+  const lineMatch = request.url.match(/^\/api\/lines\/([^/]+)$/);
+  if (lineMatch) {
+    const lineId = decodeURIComponent(lineMatch[1]);
+    const shiftId = request.params.get('shiftId');
+    const shift = shiftId ? SHIFTS[shiftId] : undefined;
+    const detail = shift ? createLineDetailFixture(lineId, shift) : null;
+
+    if (detail) {
+      return of(new HttpResponse({ body: detail, status: 200, url: request.urlWithParams })).pipe(
+        delay(latency),
+      );
     }
   }
 

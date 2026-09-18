@@ -68,7 +68,9 @@ const performanceTone = (
   return value >= warningThreshold ? 'warning' : 'critical';
 };
 
-const createKpis = (overview: PlantOverview): readonly OperationsKpiViewModel[] => {
+export const createKpis = (
+  overview: Pick<PlantOverview, 'metrics' | 'snapshot'>,
+): readonly OperationsKpiViewModel[] => {
   const { metrics, snapshot } = overview;
   const productionRatio = safeRatio(snapshot.producedUnits, snapshot.targetUnits);
   const scrapRatio = safeRatio(snapshot.scrapUnits, snapshot.producedUnits);

@@ -39,6 +39,11 @@
       </a>
       <a
         routerLink="/lines/cutting-01"
+        [queryParams]="{
+          plant: filters().plantId,
+          shift: filters().shiftId,
+          line: 'cutting-01',
+        }"
         routerLinkActive="navigation__link--active"
         title="Detalle de línea"
       >

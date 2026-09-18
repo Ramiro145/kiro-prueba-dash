@@ -98,3 +98,28 @@ export interface PlantOverview {
   readonly activeAlertCount: number;
   readonly updatedAt: string;
 }
+
+export interface LineStatusInterval {
+  readonly status: LineStatus;
+  readonly startedAt: string;
+  readonly endedAt: string | null;
+}
+
+export interface LineOperationalEvent {
+  readonly id: string;
+  readonly timestamp: string;
+  readonly message: string;
+}
+
+export interface LineDetailData {
+  readonly line: ProductionLine;
+  readonly shift: Shift;
+  readonly metrics: OeeMetrics;
+  readonly snapshot: ProductionSnapshot;
+  readonly productionByHour: readonly HourlyProductionPoint[];
+  readonly statusTimeline: readonly LineStatusInterval[];
+  readonly downtimeEvents: readonly DowntimeEvent[];
+  readonly qualityDefects: readonly QualityDefect[];
+  readonly events: readonly LineOperationalEvent[];
+  readonly updatedAt: string;
+}

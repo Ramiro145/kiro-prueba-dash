@@ -2,7 +2,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { firstValueFrom } from 'rxjs';
-import { Plant, PlantOverview } from '../models/operations.models';
+import { LineDetailData, Plant, PlantOverview } from '../models/operations.models';
 import { OperationsApi } from './operations-api';
 
 describe('OperationsApi', () => {
@@ -42,6 +42,19 @@ describe('OperationsApi', () => {
     expect(request.request.method).toBe('GET');
     request.flush(response);
 
+    await expect(result).resolves.toEqual(response);
+  });
+
+  it('requests line detail using line and shift identifiers', async () => {
+    const response = { updatedAt: '2026-09-18T12:00:00.000Z' } as LineDetailData;
+    const result = firstValueFrom(api.getLineDetail('welding-01', 'morning'));
+    const request = httpController.expectOne(
+      (candidate) =>
+        candidate.url === '/api/lines/welding-01' && candidate.params.get('shiftId') === 'morning',
+    );
+
+    expect(request.request.method).toBe('GET');
+    request.flush(response);
     await expect(result).resolves.toEqual(response);
   });
 });

@@ -6,10 +6,7 @@ import { vi } from 'vitest';
 import { PreferencesStorage } from '../../../core/storage/preferences-storage';
 import { PreferencesActions } from './preferences.actions';
 import { PreferencesEffects } from './preferences.effects';
-import {
-  PREFERENCES_FEATURE_KEY,
-  preferencesReducer,
-} from './preferences.reducer';
+import { PREFERENCES_FEATURE_KEY, preferencesReducer } from './preferences.reducer';
 import { selectPreferences } from './preferences.selectors';
 
 describe('preferences store flow', () => {

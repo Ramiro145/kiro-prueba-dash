@@ -87,6 +87,11 @@
                 'Ver detalle de ' + line.name + ', estado ' + statusLabel(line.status)
               "
               [routerLink]="['/lines', line.id]"
+              [queryParams]="{
+                plant: filters().plantId,
+                shift: filters().shiftId,
+                line: line.id,
+              }"
             >
               <span class="process__indicator" aria-hidden="true"></span>
               <span class="process__code" aria-hidden="true">{{ stageCode(line.stageName) }}</span>

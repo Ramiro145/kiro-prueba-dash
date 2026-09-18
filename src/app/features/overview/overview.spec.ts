@@ -83,7 +83,9 @@ describe('Overview', () => {
       'Planta Norte',
     );
     expect(element.querySelector('[data-testid="kpi-item"]')?.textContent).toContain('78.0%');
-    expect(firstLine?.getAttribute('href')).toBe('/lines/cutting-01');
+    expect(firstLine?.getAttribute('href')).toBe(
+      '/lines/cutting-01?plant=plant-north&shift=morning&line=cutting-01',
+    );
     expect(firstLine?.getAttribute('aria-label')).toBe('Ver detalle de Corte 01, estado Operativa');
   });
 

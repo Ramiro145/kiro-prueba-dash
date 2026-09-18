@@ -33,6 +33,16 @@ describe('mockApiInterceptor', () => {
     ]);
   });
 
+  it('serves a typed line detail and returns 404 for an unknown line', async () => {
+    const detail = await firstValueFrom(api.getLineDetail('welding-01', 'morning'));
+
+    expect(detail.line.name).toBe('Soldadura 01');
+    expect(detail.downtimeEvents[0].reason).toBe('Ajuste de soldadura');
+    await expect(firstValueFrom(api.getLineDetail('missing', 'morning'))).rejects.toMatchObject({
+      status: 404,
+    });
+  });
+
   it('returns an HTTP 404 for an unknown plant', async () => {
     await expect(firstValueFrom(api.getOverview('missing', 'morning'))).rejects.toMatchObject({
       status: 404,

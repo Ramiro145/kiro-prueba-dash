@@ -19,7 +19,7 @@ const SHIFT_NAMES: Record<string, string> = {
 })
 export class AppShell implements OnInit {
   private readonly store = inject(Store);
-  private readonly filters = this.store.selectSignal(selectDashboardFilters);
+  protected readonly filters = this.store.selectSignal(selectDashboardFilters);
 
   protected readonly preferences = this.store.selectSignal(selectPreferences);
   protected readonly shiftName = computed(() => SHIFT_NAMES[this.filters().shiftId] ?? 'Mañana');
