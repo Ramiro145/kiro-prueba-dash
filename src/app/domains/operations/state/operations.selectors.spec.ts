@@ -1,6 +1,10 @@
 import { NORTH_PLANT_OVERVIEW } from '../../../core/mock-api/operations.fixtures';
+import { DEFAULT_DASHBOARD_FILTERS } from './dashboard-filters.selectors';
 import { initialOperationsState } from './operations.reducer';
-import { selectOperationsViewModel } from './operations.selectors';
+import {
+  selectDashboardOperationsViewModel,
+  selectOperationsViewModel,
+} from './operations.selectors';
 
 describe('operations selectors', () => {
   it('returns a loading view model before data arrives', () => {
@@ -10,6 +14,8 @@ describe('operations selectors', () => {
     });
 
     expect(viewModel.status).toBe('loading');
+    expect(viewModel.refreshing).toBe(false);
+    expect(viewModel.stale).toBe(false);
     expect(viewModel.plantName).toBeNull();
     expect(viewModel.lines).toEqual([]);
     expect(viewModel.kpis).toEqual([]);
@@ -35,6 +41,46 @@ describe('operations selectors', () => {
       { id: 'scrap', value: '1.9%' },
       { id: 'downtime', value: '135 min' },
     ]);
+  });
+
+  it('scopes lines and KPIs when a line filter is active', () => {
+    const state = {
+      ...initialOperationsState,
+      data: NORTH_PLANT_OVERVIEW,
+    };
+    const baseViewModel = selectOperationsViewModel.projector(state);
+    const viewModel = selectDashboardOperationsViewModel.projector(baseViewModel, state, {
+      ...DEFAULT_DASHBOARD_FILTERS,
+      lineId: 'welding-01',
+    });
+
+    expect(viewModel.lines.map(({ id }) => id)).toEqual(['welding-01']);
+    expect(viewModel.kpis.find(({ id }) => id === 'oee')?.value).toBe('61.0%');
+    expect(viewModel.kpis.find(({ id }) => id === 'downtime')?.value).toBe('78 min');
+  });
+
+  it('returns an explicit empty view model for an overview without lines', () => {
+    const viewModel = selectOperationsViewModel.projector({
+      ...initialOperationsState,
+      data: { ...NORTH_PLANT_OVERVIEW, lines: [] },
+    });
+
+    expect(viewModel.status).toBe('empty');
+    expect(viewModel.lines).toEqual([]);
+  });
+
+  it('keeps ready data visible while exposing refresh degradation', () => {
+    const viewModel = selectOperationsViewModel.projector({
+      ...initialOperationsState,
+      data: NORTH_PLANT_OVERVIEW,
+      stale: true,
+      error: 'Servicio no disponible',
+    });
+
+    expect(viewModel.status).toBe('ready');
+    expect(viewModel.stale).toBe(true);
+    expect(viewModel.error).toBe('Servicio no disponible');
+    expect(viewModel.lines).toHaveLength(4);
   });
 
   it('represents unavailable metrics safely and protects division by zero', () => {

@@ -1,0 +1,36 @@
+<section class="filters" aria-label="Filtros operativos">
+  <div class="filters__heading">
+    <span aria-hidden="true">CTX</span>
+    <strong>Contexto de lectura</strong>
+  </div>
+
+  <label>
+    <span>Planta</span>
+    <select [value]="filters().plantId" (change)="changePlant($event)">
+      <option value="plant-north">Planta Norte</option>
+    </select>
+  </label>
+
+  <label>
+    <span>Turno</span>
+    <select [value]="filters().shiftId" (change)="changeShift($event)">
+      <option value="morning">Mañana · 06–14</option>
+      <option value="afternoon">Tarde · 14–22</option>
+      <option value="night">Noche · 22–06</option>
+    </select>
+  </label>
+
+  <label>
+    <span>Línea</span>
+    <select
+      data-testid="line-filter"
+      [value]="filters().lineId ?? ''"
+      (change)="changeLine($event)"
+    >
+      <option value="">Todas las líneas</option>
+      @for (line of lines(); track line.id) {
+        <option [value]="line.id">{{ line.name }}</option>
+      }
+    </select>
+  </label>
+</section>

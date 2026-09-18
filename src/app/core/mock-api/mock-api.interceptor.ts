@@ -8,11 +8,18 @@ import {
 } from '@angular/common/http';
 import { inject, InjectionToken } from '@angular/core';
 import { delay, Observable, of, throwError } from 'rxjs';
+import { Shift } from '../../domains/operations/models/operations.models';
 import { NORTH_PLANT_OVERVIEW, PLANTS } from './operations.fixtures';
 
 export const MOCK_API_LATENCY = new InjectionToken<number>('MOCK_API_LATENCY', {
   factory: () => 250,
 });
+
+const SHIFTS: Record<string, Shift> = {
+  morning: { id: 'morning', name: 'Turno mañana', startTime: '06:00', endTime: '14:00' },
+  afternoon: { id: 'afternoon', name: 'Turno tarde', startTime: '14:00', endTime: '22:00' },
+  night: { id: 'night', name: 'Turno noche', startTime: '22:00', endTime: '06:00' },
+};
 
 export const mockApiInterceptor: HttpInterceptorFn = (
   request: HttpRequest<unknown>,
@@ -38,11 +45,12 @@ export const mockApiInterceptor: HttpInterceptorFn = (
   if (overviewMatch) {
     const plantId = decodeURIComponent(overviewMatch[1]);
     const shiftId = request.params.get('shiftId');
+    const shift = shiftId ? SHIFTS[shiftId] : undefined;
 
-    if (plantId === NORTH_PLANT_OVERVIEW.plant.id && shiftId === NORTH_PLANT_OVERVIEW.shift.id) {
+    if (plantId === NORTH_PLANT_OVERVIEW.plant.id && shift) {
       return of(
         new HttpResponse({
-          body: NORTH_PLANT_OVERVIEW,
+          body: { ...NORTH_PLANT_OVERVIEW, shift },
           status: 200,
           url: request.urlWithParams,
         }),

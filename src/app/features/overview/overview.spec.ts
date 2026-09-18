@@ -4,13 +4,21 @@ import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { vi } from 'vitest';
 import { OperationsActions } from '../../domains/operations/state/operations.actions';
 import {
+  DEFAULT_DASHBOARD_FILTERS,
+  selectDashboardFilters,
+} from '../../domains/operations/state/dashboard-filters.selectors';
+import {
   OperationsViewModel,
-  selectOperationsViewModel,
+  selectOperationsAnalyticsData,
+  selectOperationsLineOptions,
+  selectDashboardOperationsViewModel,
 } from '../../domains/operations/state/operations.selectors';
 import { Overview } from './overview';
 
 const readyViewModel: OperationsViewModel = {
   status: 'ready',
+  refreshing: false,
+  stale: false,
   plantName: 'Planta Norte',
   location: 'Monterrey, NL',
   shiftName: 'Turno mañana',
@@ -42,44 +50,45 @@ describe('Overview', () => {
       providers: [
         provideRouter([]),
         provideMockStore({
-          selectors: [{ selector: selectOperationsViewModel, value: readyViewModel }],
+          selectors: [
+            { selector: selectDashboardOperationsViewModel, value: readyViewModel },
+            { selector: selectOperationsAnalyticsData, value: null },
+            { selector: selectOperationsLineOptions, value: readyViewModel.lines },
+            { selector: selectDashboardFilters, value: DEFAULT_DASHBOARD_FILTERS },
+          ],
         }),
       ],
     }).compileComponents();
     store = TestBed.inject(MockStore);
   });
 
-  it('requests and presents the operational dashboard', () => {
+  it('starts and stops the overview lifecycle through NgRx', () => {
     const dispatch = vi.spyOn(store, 'dispatch');
     const fixture = TestBed.createComponent(Overview);
     fixture.detectChanges();
-    const element = fixture.nativeElement as HTMLElement;
 
-    expect(dispatch).toHaveBeenCalledWith(
-      OperationsActions.loadOverview({ plantId: 'plant-north', shiftId: 'morning' }),
-    );
-    expect(element.querySelector('[data-testid="plant-name"]')?.textContent).toContain(
-      'Planta Norte',
-    );
-    expect(element.querySelector('[data-testid="kpi-item"]')?.textContent).toContain('78.0%');
-    expect(element.textContent).toContain('Corte');
-    expect(element.textContent).toContain('Conformado');
-    expect(element.textContent).toContain('Soldadura');
-    expect(element.textContent).toContain('Acabado');
+    expect(dispatch).toHaveBeenCalledWith(OperationsActions.enterOverview());
+
+    fixture.destroy();
+    expect(dispatch).toHaveBeenCalledWith(OperationsActions.leaveOverview());
   });
 
-  it('links every process stage to its line detail with an accessible label', () => {
+  it('presents the operational dashboard and contextual line links', () => {
     const fixture = TestBed.createComponent(Overview);
     fixture.detectChanges();
     const element = fixture.nativeElement as HTMLElement;
     const firstLine = element.querySelector<HTMLAnchorElement>('.process__stage');
 
+    expect(element.querySelector('[data-testid="plant-name"]')?.textContent).toContain(
+      'Planta Norte',
+    );
+    expect(element.querySelector('[data-testid="kpi-item"]')?.textContent).toContain('78.0%');
     expect(firstLine?.getAttribute('href')).toBe('/lines/cutting-01');
     expect(firstLine?.getAttribute('aria-label')).toBe('Ver detalle de Corte 01, estado Operativa');
   });
 
   it('presents an accessible loading state', () => {
-    store.overrideSelector(selectOperationsViewModel, {
+    store.overrideSelector(selectDashboardOperationsViewModel, {
       ...readyViewModel,
       status: 'loading',
       plantName: null,
@@ -95,8 +104,42 @@ describe('Overview', () => {
     ).toContain('Cargando');
   });
 
+  it('presents retained data with a stale warning after refresh failure', () => {
+    store.overrideSelector(selectDashboardOperationsViewModel, {
+      ...readyViewModel,
+      stale: true,
+      error: 'No se pudo actualizar.',
+    });
+    const fixture = TestBed.createComponent(Overview);
+    fixture.detectChanges();
+
+    expect(
+      (fixture.nativeElement as HTMLElement).querySelector('[data-testid="stale-warning"]')
+        ?.textContent,
+    ).toContain('Datos desactualizados');
+    expect((fixture.nativeElement as HTMLElement).querySelectorAll('.process__stage')).toHaveLength(
+      4,
+    );
+  });
+
+  it('presents an explicit empty state', () => {
+    store.overrideSelector(selectDashboardOperationsViewModel, {
+      ...readyViewModel,
+      status: 'empty',
+      lines: [],
+      kpis: [],
+    });
+    const fixture = TestBed.createComponent(Overview);
+    fixture.detectChanges();
+
+    expect(
+      (fixture.nativeElement as HTMLElement).querySelector('[data-testid="empty-state"]')
+        ?.textContent,
+    ).toContain('No hay líneas');
+  });
+
   it('presents an accessible initial error state', () => {
-    store.overrideSelector(selectOperationsViewModel, {
+    store.overrideSelector(selectDashboardOperationsViewModel, {
       ...readyViewModel,
       status: 'error',
       plantName: null,

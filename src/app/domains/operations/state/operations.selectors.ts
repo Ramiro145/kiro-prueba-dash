@@ -1,8 +1,9 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
 import { LineStage, LineStatus, PlantOverview } from '../models/operations.models';
 import { OPERATIONS_FEATURE_KEY, OperationsState } from './operations.reducer';
+import { selectDashboardFilters } from './dashboard-filters.selectors';
 
-export type OperationsViewStatus = 'idle' | 'loading' | 'ready' | 'error';
+export type OperationsViewStatus = 'idle' | 'loading' | 'ready' | 'empty' | 'error';
 export type OperationsKpiTone = 'neutral' | 'positive' | 'warning' | 'critical';
 
 export interface OperationsLineViewModel {
@@ -22,6 +23,8 @@ export interface OperationsKpiViewModel {
 
 export interface OperationsViewModel {
   readonly status: OperationsViewStatus;
+  readonly refreshing: boolean;
+  readonly stale: boolean;
   readonly plantName: string | null;
   readonly location: string | null;
   readonly shiftName: string | null;
@@ -151,7 +154,9 @@ export const selectOperationsViewModel = createSelector(
   selectOperationsState,
   (state): OperationsViewModel => {
     const status: OperationsViewStatus = state.data
-      ? 'ready'
+      ? state.data.lines.length > 0
+        ? 'ready'
+        : 'empty'
       : state.loading
         ? 'loading'
         : state.error
@@ -160,6 +165,8 @@ export const selectOperationsViewModel = createSelector(
 
     return {
       status,
+      refreshing: state.refreshing,
+      stale: state.stale,
       plantName: state.data?.plant.name ?? null,
       location: state.data?.plant.location ?? null,
       shiftName: state.data?.shift.name ?? null,
@@ -173,6 +180,38 @@ export const selectOperationsViewModel = createSelector(
           status: line.status,
         })) ?? [],
       kpis: state.data ? createKpis(state.data) : [],
+    };
+  },
+);
+
+export const selectOperationsLineOptions = createSelector(
+  selectOperationsState,
+  (state) => state?.data?.lines.map(({ id, name }) => ({ id, name })) ?? [],
+);
+
+export const selectDashboardOperationsViewModel = createSelector(
+  selectOperationsViewModel,
+  selectOperationsState,
+  selectDashboardFilters,
+  (viewModel, state, filters): OperationsViewModel => {
+    if (!filters.lineId || !state?.data) {
+      return viewModel;
+    }
+
+    const line = state.data.lines.find(({ id }) => id === filters.lineId);
+    const lineViewModel = viewModel.lines.find(({ id }) => id === filters.lineId);
+    if (!line || !lineViewModel) {
+      return { ...viewModel, status: 'empty', lines: [], kpis: [] };
+    }
+
+    return {
+      ...viewModel,
+      lines: [lineViewModel],
+      kpis: createKpis({
+        ...state.data,
+        metrics: line.metrics,
+        snapshot: line.snapshot,
+      }),
     };
   },
 );

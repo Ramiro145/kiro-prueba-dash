@@ -3,11 +3,14 @@
     <p class="overview__eyebrow">Planta de transformación de acero</p>
     <h1>Resumen de planta</h1>
 
-    @if (viewModel().status === 'ready') {
+    @if (viewModel().status === 'ready' || viewModel().status === 'empty') {
       <div class="overview__identity">
         <strong data-testid="plant-name">{{ viewModel().plantName }}</strong>
         <span>{{ viewModel().location }}</span>
         <span>{{ viewModel().shiftName }}</span>
+        @if (viewModel().refreshing) {
+          <span class="overview__sync" role="status">Actualizando lectura…</span>
+        }
       </div>
     } @else {
       <p class="overview__description">
@@ -15,6 +18,22 @@
       </p>
     }
   </header>
+
+  <app-overview-filters
+    [filters]="filters()"
+    [lines]="lineOptions()"
+    (filtersChange)="updateFilters($event)"
+  />
+
+  @if (viewModel().stale) {
+    <section class="stale-warning" data-testid="stale-warning" role="alert">
+      <div>
+        <strong>Datos desactualizados</strong>
+        <p>{{ viewModel().error }} Se mantiene la última lectura válida.</p>
+      </div>
+      <button type="button" (click)="loadOverview()">Actualizar ahora</button>
+    </section>
+  }
 
   @if (viewModel().status === 'loading' || viewModel().status === 'idle') {
     <section class="overview-state" role="status" aria-live="polite">
@@ -31,6 +50,14 @@
         <strong>No se pudo cargar la operación</strong>
         <p>{{ viewModel().error }}</p>
         <button type="button" (click)="loadOverview()">Reintentar consulta</button>
+      </div>
+    </section>
+  } @else if (viewModel().status === 'empty') {
+    <section class="overview-state" data-testid="empty-state" role="status">
+      <span class="overview-state__code" aria-hidden="true">0</span>
+      <div>
+        <strong>No hay líneas para este contexto</strong>
+        <p>Cambia los filtros de planta, turno o línea para continuar.</p>
       </div>
     </section>
   } @else {
@@ -62,7 +89,7 @@
               [routerLink]="['/lines', line.id]"
             >
               <span class="process__indicator" aria-hidden="true"></span>
-              <span class="process__code" aria-hidden="true">0{{ $index + 1 }}</span>
+              <span class="process__code" aria-hidden="true">{{ stageCode(line.stageName) }}</span>
               <span class="process__line">
                 <strong>{{ line.stageName }}</strong>
                 <small>{{ line.name }}</small>

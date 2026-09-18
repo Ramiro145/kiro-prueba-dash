@@ -62,3 +62,38 @@
     display: grid;
   }
 }
+
+.analytics__scope {
+  display: flex;
+  grid-column: 1 / -1;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  color: var(--color-muted);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.analytics__scope p,
+.analytics__scope strong {
+  margin: 0;
+}
+
+.analytics__scope p {
+  color: var(--color-process);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.analytics__scope strong {
+  font-size: 0.8rem;
+}
+
+@media (max-width: 36rem) {
+  .analytics__scope {
+    display: grid;
+  }
+}
