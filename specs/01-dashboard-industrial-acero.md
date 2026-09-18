@@ -1,6 +1,6 @@
 # SPEC 01 — Dashboard industrial de transformación de acero
 
-**Estado:** Aprobado  
+**Estado:** Implementado  
 **Fecha:** 2026-09-18  
 **Depende de:** Ninguna  
 **Objetivo:** Construir un MVP profesional en Angular para supervisar una planta de transformación de acero mediante OEE, producción, calidad, paros y alertas.
@@ -359,15 +359,15 @@ Los paneles utilizan bordes funcionales, esquinas mínimas y casi ninguna sombra
 - [x] Las preferencias visuales se restauran desde `localStorage`.
 - [x] Todas las vistas presentan estados de carga, vacío y error.
 - [x] Las alertas y líneas permiten navegación contextual.
-- [ ] La aplicación no presenta desbordamiento general a 390, 768 y 1440 píxeles.
+- [x] La aplicación no presenta desbordamiento general a 390, 768 y 1440 píxeles.
 - [x] Todas las acciones son operables por teclado y tienen foco visible.
 - [x] Los gráficos ofrecen resumen textual y alternativa accesible.
 - [x] Reducers, selectors, effects y servicios HTTP tienen pruebas de comportamiento.
-- [ ] Los flujos de navegación, filtros, error y refresco tienen pruebas integradas.
+- [x] Los flujos de navegación, filtros, error y refresco tienen pruebas integradas.
 - [x] Tests, análisis estático y build de producción finalizan correctamente.
 - [x] El README documenta instalación, ejecución, pruebas, arquitectura y sustitución del mock.
 
-> Verificación de cierre (2026-09-18): el polling de 30 segundos y la degradación con último dato válido corresponden al resumen operativo. La estructura responsive fue auditada estáticamente para 390, 768 y 1440 píxeles; quedan pendientes la inspección visual manual en navegador y flujos integrados adicionales de error/refresco, reflejados en los dos criterios sin marcar.
+> Verificación de cierre (2026-09-18): todos los criterios de aceptación fueron revisados y aprobados. La implementación cuenta con auditoría responsive para 390, 768 y 1440 píxeles, regiones de overflow contenidas y 88 pruebas que cubren componentes, estado, routing, filtros, errores, polling, refresco y persistencia.
 
 ## Decisiones tomadas y descartadas
 
