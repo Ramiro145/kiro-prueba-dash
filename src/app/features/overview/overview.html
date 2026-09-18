@@ -2,24 +2,65 @@
   <header class="overview__header">
     <p class="overview__eyebrow">Planta de transformación de acero</p>
     <h1>Resumen de planta</h1>
-    <p class="overview__description">
-      Base técnica preparada para integrar supervisión OEE, producción, calidad y alertas.
-    </p>
+
+    @if (viewModel().status === 'ready') {
+      <div class="overview__identity">
+        <strong data-testid="plant-name">{{ viewModel().plantName }}</strong>
+        <span>{{ viewModel().location }}</span>
+        <span>{{ viewModel().shiftName }}</span>
+      </div>
+    } @else {
+      <p class="overview__description">
+        Supervisión OEE, producción, calidad y alertas del flujo industrial.
+      </p>
+    }
   </header>
 
-  <section class="process" aria-labelledby="process-title">
-    <div>
-      <p class="process__label">Flujo productivo</p>
-      <h2 id="process-title">Líneas del proceso</h2>
-    </div>
+  @if (viewModel().status === 'loading' || viewModel().status === 'idle') {
+    <section class="overview-state" role="status" aria-live="polite">
+      <span class="overview-state__pulse" aria-hidden="true"></span>
+      <div>
+        <strong>Cargando telemetría de planta</strong>
+        <p>Consultando el estado operativo del turno…</p>
+      </div>
+    </section>
+  } @else if (viewModel().status === 'error') {
+    <section class="overview-state overview-state--error" role="alert">
+      <span class="overview-state__code" aria-hidden="true">!</span>
+      <div>
+        <strong>No se pudo cargar la operación</strong>
+        <p>{{ viewModel().error }}</p>
+        <button type="button" (click)="loadOverview()">Reintentar consulta</button>
+      </div>
+    </section>
+  } @else {
+    <section class="process" aria-labelledby="process-title">
+      <header class="process__header">
+        <div>
+          <p class="process__label">Flujo productivo</p>
+          <h2 id="process-title">Líneas del proceso</h2>
+        </div>
+        <p class="process__updated">
+          Última lectura
+          <time [attr.datetime]="viewModel().updatedAt">
+            {{ viewModel().updatedAt | date: 'HH:mm:ss' }}
+          </time>
+        </p>
+      </header>
 
-    <ol class="process__stages">
-      @for (stage of stages; track stage.code) {
-        <li class="process__stage">
-          <span class="process__code" aria-hidden="true">{{ stage.code }}</span>
-          <span>{{ stage.name }}</span>
-        </li>
-      }
-    </ol>
-  </section>
+      <ol class="process__stages">
+        @for (line of viewModel().lines; track line.id) {
+          <li class="process__stage" [attr.data-status]="line.status">
+            <span class="process__indicator" aria-hidden="true"></span>
+            <span class="process__code" aria-hidden="true">0{{ $index + 1 }}</span>
+            <span class="process__line">
+              <strong>{{ line.stageName }}</strong>
+              <small>{{ line.name }}</small>
+            </span>
+            <span class="process__status">{{ statusLabel(line.status) }}</span>
+          </li>
+        }
+      </ol>
+    </section>
+  }
 </main>
