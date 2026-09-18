@@ -9,6 +9,7 @@ import {
 import { inject, InjectionToken } from '@angular/core';
 import { delay, Observable, of, throwError } from 'rxjs';
 import { Shift } from '../../domains/operations/models/operations.models';
+import { ALERTS_RESPONSE } from './alerts.fixtures';
 import { createLineDetailFixture } from './line-detail.fixtures';
 import { NORTH_PLANT_OVERVIEW, PLANTS } from './operations.fixtures';
 
@@ -55,6 +56,16 @@ export const mockApiInterceptor: HttpInterceptorFn = (
           status: 200,
           url: request.urlWithParams,
         }),
+      ).pipe(delay(latency));
+    }
+  }
+
+  if (request.url === '/api/alerts') {
+    const plantId = request.params.get('plantId');
+    const shiftId = request.params.get('shiftId');
+    if (plantId === NORTH_PLANT_OVERVIEW.plant.id && shiftId && SHIFTS[shiftId]) {
+      return of(
+        new HttpResponse({ body: ALERTS_RESPONSE, status: 200, url: request.urlWithParams }),
       ).pipe(delay(latency));
     }
   }

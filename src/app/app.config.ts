@@ -6,6 +6,8 @@ import { provideRouterStore, routerReducer } from '@ngrx/router-store';
 import { provideStore } from '@ngrx/store';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
 import { routes } from './app.routes';
+import { AlertsEffects } from './domains/alerts/state/alerts.effects';
+import { ALERTS_FEATURE_KEY, alertsReducer } from './domains/alerts/state/alerts.reducer';
 import { mockApiInterceptor } from './core/mock-api/mock-api.interceptor';
 import { LineDetailEffects } from './domains/operations/state/line-detail.effects';
 import {
@@ -32,6 +34,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([mockApiInterceptor])),
     provideStore({
       router: routerReducer,
+      [ALERTS_FEATURE_KEY]: alertsReducer,
       [OPERATIONS_FEATURE_KEY]: operationsReducer,
       [LINE_DETAIL_FEATURE_KEY]: lineDetailReducer,
       [PREFERENCES_FEATURE_KEY]: preferencesReducer,
@@ -40,6 +43,7 @@ export const appConfig: ApplicationConfig = {
       OperationsEffects,
       OverviewLifecycleEffects,
       LineDetailEffects,
+      AlertsEffects,
       PreferencesEffects,
     ),
     provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),

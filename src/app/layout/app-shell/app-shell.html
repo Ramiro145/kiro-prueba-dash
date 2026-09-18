@@ -50,7 +50,16 @@
         <span class="navigation__glyph navigation__glyph--line" aria-hidden="true"></span>
         <span class="navigation__label">Detalle de línea</span>
       </a>
-      <a routerLink="/alerts" routerLinkActive="navigation__link--active" title="Alertas">
+      <a
+        routerLink="/alerts"
+        [queryParams]="{
+          plant: filters().plantId,
+          shift: filters().shiftId,
+          line: filters().lineId,
+        }"
+        routerLinkActive="navigation__link--active"
+        title="Alertas"
+      >
         <span class="navigation__glyph navigation__glyph--alerts" aria-hidden="true"></span>
         <span class="navigation__label">Alertas</span>
       </a>

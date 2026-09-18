@@ -1,9 +1,152 @@
-<section class="workspace-placeholder" aria-labelledby="alerts-title">
-  <p class="workspace-placeholder__eyebrow">Supervisión de incidencias</p>
-  <h1 id="alerts-title">Centro de alertas</h1>
-  <p>La consulta y clasificación de alertas se incorporará en el incremento de alertas.</p>
-  <div class="workspace-placeholder__status">
-    <span aria-hidden="true">08</span>
-    <strong>Task 8 preparada</strong>
-  </div>
-</section>
+<main class="alerts-page">
+  <header class="alerts-header">
+    <div>
+      <p>Supervisión de incidencias</p>
+      <h1>Centro de alertas</h1>
+      <span>Consulta operativa · sin acciones de reconocimiento</span>
+    </div>
+    <dl class="alerts-summary" aria-label="Resumen de alertas">
+      <div>
+        <dt>Total</dt>
+        <dd>{{ viewModel().totalCount }}</dd>
+      </div>
+      <div>
+        <dt>Activas</dt>
+        <dd>{{ viewModel().activeCount }}</dd>
+      </div>
+      <div data-tone="critical">
+        <dt>Críticas</dt>
+        <dd>{{ viewModel().criticalCount }}</dd>
+      </div>
+    </dl>
+  </header>
+
+  <section class="alert-filters" aria-label="Filtros de alertas">
+    <div class="alert-filters__heading">
+      <span aria-hidden="true">FLT</span><strong>Clasificar incidencias</strong>
+    </div>
+    <label>
+      <span>Severidad</span>
+      <select
+        data-testid="severity-filter"
+        [value]="viewModel().filters.severity"
+        (change)="changeSeverity($event)"
+      >
+        <option value="all">Todas</option>
+        <option value="critical">Críticas</option>
+        <option value="warning">Preventivas</option>
+        <option value="info">Informativas</option>
+      </select>
+    </label>
+    <label>
+      <span>Estado</span>
+      <select [value]="viewModel().filters.status" (change)="changeStatus($event)">
+        <option value="all">Todos</option>
+        <option value="active">Activas</option>
+        <option value="resolved">Resueltas</option>
+      </select>
+    </label>
+    <label>
+      <span>Línea</span>
+      <select [value]="viewModel().filters.lineId ?? ''" (change)="changeLine($event)">
+        <option value="">Todas las líneas</option>
+        @for (line of viewModel().lineOptions; track line.id) {
+          <option [value]="line.id">{{ line.name }}</option>
+        }
+      </select>
+    </label>
+  </section>
+
+  @if (viewModel().status === 'loading' || viewModel().status === 'idle') {
+    <section class="alerts-state" role="status" aria-live="polite">
+      <i aria-hidden="true"></i>
+      <div>
+        <strong>Cargando alertas</strong>
+        <p>Consultando incidencias del turno…</p>
+      </div>
+    </section>
+  } @else if (viewModel().status === 'error') {
+    <section class="alerts-state alerts-state--error" role="alert">
+      <b aria-hidden="true">!</b>
+      <div>
+        <strong>No se pudieron cargar las alertas</strong>
+        <p>{{ viewModel().error }}</p>
+        <button type="button" (click)="retry()">Reintentar consulta</button>
+      </div>
+    </section>
+  } @else if (viewModel().status === 'empty') {
+    <section class="alerts-state" role="status">
+      <b aria-hidden="true">0</b>
+      <div>
+        <strong>No hay alertas para estos filtros</strong>
+        <p>Modifica severidad, estado o línea para ampliar la consulta.</p>
+      </div>
+    </section>
+  } @else {
+    <section class="alerts-table" aria-labelledby="alerts-table-title">
+      <header>
+        <div>
+          <p>Orden: severidad y antigüedad</p>
+          <h2 id="alerts-table-title">Incidencias encontradas</h2>
+        </div>
+        <span
+          ><strong>{{ viewModel().activeCount }}</strong> activas</span
+        >
+      </header>
+      <div class="alerts-table__scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Severidad</th>
+              <th>Estado</th>
+              <th>Línea</th>
+              <th>Incidencia</th>
+              <th>Inicio</th>
+              <th>Duración</th>
+              <th><span class="visually-hidden">Acción</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (alert of viewModel().alerts; track alert.id) {
+              <tr data-testid="alert-row" [attr.data-severity]="alert.severity">
+                <td>
+                  <span class="severity"><i aria-hidden="true"></i>{{ alert.severityLabel }}</span>
+                </td>
+                <td>
+                  <span class="alert-status" [attr.data-status]="alert.status">{{
+                    alert.statusLabel
+                  }}</span>
+                </td>
+                <td>
+                  <strong>{{ alert.lineName }}</strong>
+                </td>
+                <td class="alerts-table__message">{{ alert.message }}</td>
+                <td>{{ alert.startedAt }}</td>
+                <td>{{ alert.durationLabel }}</td>
+                <td>
+                  <a
+                    data-testid="alert-line-link"
+                    [routerLink]="['/lines', alert.lineId]"
+                    [queryParams]="{
+                      plant: dashboardFilters().plantId,
+                      shift: dashboardFilters().shiftId,
+                      line: alert.lineId,
+                    }"
+                    [attr.aria-label]="'Ver detalle de ' + alert.lineName"
+                    >Ver línea</a
+                  >
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <footer>
+        Datos generados
+        <time [attr.datetime]="viewModel().generatedAt">{{
+          viewModel().generatedAt | date: 'HH:mm:ss'
+        }}</time>
+      </footer>
+    </section>
+  }
+</main>
