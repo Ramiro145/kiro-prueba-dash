@@ -1,4 +1,5 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
+import { selectDashboardFilters } from '../../operations/state/dashboard-filters.selectors';
 import { AlertFilters, AlertSeverity, AlertStatus, IndustrialAlert } from '../models/alert.models';
 import { ALERTS_FEATURE_KEY, AlertsState, alertsAdapter } from './alerts.reducer';
 
@@ -12,6 +13,7 @@ export interface AlertRowViewModel {
   readonly statusLabel: string;
   readonly lineId: string;
   readonly lineName: string;
+  readonly plantName: string;
   readonly message: string;
   readonly startedAt: string;
   readonly durationLabel: string;
@@ -80,6 +82,7 @@ const toRow = (alert: IndustrialAlert, generatedAt: string | null): AlertRowView
     statusLabel: STATUS_LABEL[alert.status],
     lineId: alert.lineId,
     lineName: alert.lineName,
+    plantName: alert.plantId === 'plant-north' ? 'Planta Norte' : alert.plantId,
     message: alert.message,
     startedAt: hourFormatter.format(new Date(alert.startedAt)),
     durationLabel: duration === null ? '—' : `${duration} min`,
@@ -124,3 +127,22 @@ export const selectAlertsViewModel = createSelector(selectAlertsState, (state): 
     alerts: filtered.map((alert) => toRow(alert, state.generatedAt)),
   };
 });
+
+export const selectDashboardAlertsViewModel = createSelector(
+  selectAlertsViewModel,
+  selectDashboardFilters,
+  (viewModel, dashboardFilters): AlertsViewModel => {
+    const lineId = dashboardFilters.lineId;
+    const alerts = lineId
+      ? viewModel.alerts.filter((alert) => alert.lineId === lineId)
+      : viewModel.alerts;
+    const dataStatus = viewModel.status === 'ready' || viewModel.status === 'empty';
+
+    return {
+      ...viewModel,
+      status: dataStatus ? (alerts.length > 0 ? 'ready' : 'empty') : viewModel.status,
+      filters: { ...viewModel.filters, lineId },
+      alerts,
+    };
+  },
+);

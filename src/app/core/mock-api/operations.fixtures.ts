@@ -135,6 +135,6 @@ export const NORTH_PLANT_OVERVIEW: PlantOverview = {
     { category: 'Rebaba', count: 9, percentage: 0.31 },
     { category: 'Desalineación', count: 8, percentage: 0.28 },
   ],
-  activeAlertCount: 3,
+  activeAlertCount: 4,
   updatedAt: UPDATED_AT,
 };

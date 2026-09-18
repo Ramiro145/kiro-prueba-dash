@@ -47,6 +47,11 @@ export const operationsReducer = createReducer(
       lastUpdated: null,
     };
   }),
+  on(OperationsActions.leaveOverview, (state): OperationsState => ({
+    ...state,
+    loading: false,
+    refreshing: false,
+  })),
   on(OperationsActions.loadOverview, (state, { context }): OperationsState => {
     const retainData = state.data !== null && sameContext(state.dataContext, context);
     return {

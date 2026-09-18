@@ -29,6 +29,7 @@ export interface OperationsViewModel {
   readonly location: string | null;
   readonly shiftName: string | null;
   readonly updatedAt: string | null;
+  readonly activeAlertCount: number;
   readonly error: string | null;
   readonly lines: readonly OperationsLineViewModel[];
   readonly kpis: readonly OperationsKpiViewModel[];
@@ -173,6 +174,7 @@ export const selectOperationsViewModel = createSelector(
       location: state.data?.plant.location ?? null,
       shiftName: state.data?.shift.name ?? null,
       updatedAt: state.lastUpdated,
+      activeAlertCount: state.data?.activeAlertCount ?? 0,
       error: state.error,
       lines:
         state.data?.lines.map((line) => ({

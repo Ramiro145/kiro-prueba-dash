@@ -12,6 +12,7 @@ import { Shift } from '../../domains/operations/models/operations.models';
 import { ALERTS_RESPONSE } from './alerts.fixtures';
 import { createLineDetailFixture } from './line-detail.fixtures';
 import { NORTH_PLANT_OVERVIEW, PLANTS } from './operations.fixtures';
+import { alertsForShift, lineDetailForShift, overviewForShift } from './shift-fixtures';
 
 export const MOCK_API_LATENCY = new InjectionToken<number>('MOCK_API_LATENCY', {
   factory: () => 250,
@@ -52,7 +53,7 @@ export const mockApiInterceptor: HttpInterceptorFn = (
     if (plantId === NORTH_PLANT_OVERVIEW.plant.id && shift) {
       return of(
         new HttpResponse({
-          body: { ...NORTH_PLANT_OVERVIEW, shift },
+          body: overviewForShift(NORTH_PLANT_OVERVIEW, shift),
           status: 200,
           url: request.urlWithParams,
         }),
@@ -65,7 +66,11 @@ export const mockApiInterceptor: HttpInterceptorFn = (
     const shiftId = request.params.get('shiftId');
     if (plantId === NORTH_PLANT_OVERVIEW.plant.id && shiftId && SHIFTS[shiftId]) {
       return of(
-        new HttpResponse({ body: ALERTS_RESPONSE, status: 200, url: request.urlWithParams }),
+        new HttpResponse({
+          body: alertsForShift(ALERTS_RESPONSE, SHIFTS[shiftId]),
+          status: 200,
+          url: request.urlWithParams,
+        }),
       ).pipe(delay(latency));
     }
   }
@@ -77,10 +82,14 @@ export const mockApiInterceptor: HttpInterceptorFn = (
     const shift = shiftId ? SHIFTS[shiftId] : undefined;
     const detail = shift ? createLineDetailFixture(lineId, shift) : null;
 
-    if (detail) {
-      return of(new HttpResponse({ body: detail, status: 200, url: request.urlWithParams })).pipe(
-        delay(latency),
-      );
+    if (detail && shift) {
+      return of(
+        new HttpResponse({
+          body: lineDetailForShift(detail, shift),
+          status: 200,
+          url: request.urlWithParams,
+        }),
+      ).pipe(delay(latency));
     }
   }
 

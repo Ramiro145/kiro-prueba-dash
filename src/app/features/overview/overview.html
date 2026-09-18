@@ -1,4 +1,4 @@
-<main class="overview">
+<div class="overview">
   <header class="overview__header">
     <p class="overview__eyebrow">Planta de transformación de acero</p>
     <h1>Resumen de planta</h1>
@@ -106,10 +106,25 @@
       </ol>
     </section>
 
+    <a
+      class="overview-alert-summary"
+      routerLink="/alerts"
+      [queryParams]="{
+        plant: filters().plantId,
+        shift: filters().shiftId,
+        line: filters().lineId,
+      }"
+    >
+      <span
+        ><strong>{{ viewModel().activeAlertCount }}</strong> alertas activas</span
+      >
+      <span>Revisar centro de alertas <i aria-hidden="true">→</i></span>
+    </a>
+
     @defer (when chartModels()) {
       @if (chartModels(); as charts) {
         <app-overview-analytics [models]="charts" />
       }
     }
   }
-</main>
+</div>

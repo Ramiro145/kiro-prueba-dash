@@ -23,6 +23,7 @@ const readyViewModel: OperationsViewModel = {
   location: 'Monterrey, NL',
   shiftName: 'Turno mañana',
   updatedAt: '2026-09-18T12:00:00.000Z',
+  activeAlertCount: 4,
   error: null,
   kpis: [
     {
@@ -83,6 +84,7 @@ describe('Overview', () => {
       'Planta Norte',
     );
     expect(element.querySelector('[data-testid="kpi-item"]')?.textContent).toContain('78.0%');
+    expect(element.textContent).toContain('4 alertas activas');
     expect(firstLine?.getAttribute('href')).toBe(
       '/lines/cutting-01?plant=plant-north&shift=morning&line=cutting-01',
     );

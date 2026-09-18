@@ -1,10 +1,11 @@
 import { DatePipe } from '@angular/common';
-import { Component, computed, effect, inject, OnInit } from '@angular/core';
+import { Component, computed, effect, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AlertFilters } from '../../domains/alerts/models/alert.models';
 import { AlertsActions } from '../../domains/alerts/state/alerts.actions';
-import { selectAlertsViewModel } from '../../domains/alerts/state/alerts.selectors';
+import { selectDashboardAlertsViewModel } from '../../domains/alerts/state/alerts.selectors';
+import { OperationsActions } from '../../domains/operations/state/operations.actions';
 import { selectDashboardFilters } from '../../domains/operations/state/dashboard-filters.selectors';
 
 @Component({
@@ -13,11 +14,11 @@ import { selectDashboardFilters } from '../../domains/operations/state/dashboard
   styleUrl: './alerts.scss',
   templateUrl: './alerts.html',
 })
-export class Alerts implements OnInit {
+export class Alerts {
   private readonly store = inject(Store);
 
   protected readonly dashboardFilters = this.store.selectSignal(selectDashboardFilters);
-  protected readonly viewModel = this.store.selectSignal(selectAlertsViewModel);
+  protected readonly viewModel = this.store.selectSignal(selectDashboardAlertsViewModel);
   private readonly requestContext = computed(
     () => `${this.dashboardFilters().plantId}|${this.dashboardFilters().shiftId}`,
   );
@@ -27,13 +28,6 @@ export class Alerts implements OnInit {
       const [plantId, shiftId] = this.requestContext().split('|');
       this.store.dispatch(AlertsActions.load({ plantId, shiftId }));
     });
-  }
-
-  ngOnInit(): void {
-    const lineId = this.dashboardFilters().lineId;
-    if (lineId) {
-      this.updateFilters({ lineId });
-    }
   }
 
   protected changeSeverity(event: Event): void {
@@ -49,7 +43,12 @@ export class Alerts implements OnInit {
   }
 
   protected changeLine(event: Event): void {
-    this.updateFilters({ lineId: (event.target as HTMLSelectElement).value || null });
+    const lineId = (event.target as HTMLSelectElement).value || null;
+    this.store.dispatch(
+      OperationsActions.updateFilters({
+        filters: { ...this.dashboardFilters(), lineId },
+      }),
+    );
   }
 
   protected retry(): void {
@@ -60,7 +59,7 @@ export class Alerts implements OnInit {
   private updateFilters(changes: Partial<AlertFilters>): void {
     this.store.dispatch(
       AlertsActions.setFilters({
-        filters: { ...this.viewModel().filters, ...changes },
+        filters: { ...this.viewModel().filters, ...changes, lineId: null },
       }),
     );
   }

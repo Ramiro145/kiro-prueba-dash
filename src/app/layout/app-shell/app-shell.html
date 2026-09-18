@@ -5,7 +5,7 @@
   [class.shell--collapsed]="preferences().navigationCollapsed"
   [class.shell--compact]="preferences().density === 'compact'"
 >
-  <aside class="shell__sidebar" aria-label="Navegación de operaciones">
+  <aside id="navigation-panel" class="shell__sidebar" aria-label="Navegación de operaciones">
     <div class="brand">
       <span class="brand__mark" aria-hidden="true">AC</span>
       <span class="brand__copy">
@@ -18,6 +18,7 @@
       class="navigation-toggle"
       type="button"
       data-testid="navigation-toggle"
+      aria-controls="navigation-panel"
       [attr.aria-expanded]="!preferences().navigationCollapsed"
       [attr.aria-label]="
         preferences().navigationCollapsed ? 'Expandir navegación' : 'Contraer navegación'
@@ -30,21 +31,27 @@
     <nav class="navigation" aria-label="Principal">
       <a
         routerLink="/overview"
+        [queryParams]="{
+          plant: filters().plantId,
+          shift: filters().shiftId,
+          line: filters().lineId,
+        }"
         routerLinkActive="navigation__link--active"
-        [routerLinkActiveOptions]="{ exact: true }"
+        ariaCurrentWhenActive="page"
         title="Resumen"
       >
         <span class="navigation__glyph navigation__glyph--overview" aria-hidden="true"></span>
         <span class="navigation__label">Resumen</span>
       </a>
       <a
-        routerLink="/lines/cutting-01"
+        [routerLink]="['/lines', selectedLineId()]"
         [queryParams]="{
           plant: filters().plantId,
           shift: filters().shiftId,
-          line: 'cutting-01',
+          line: selectedLineId(),
         }"
         routerLinkActive="navigation__link--active"
+        ariaCurrentWhenActive="page"
         title="Detalle de línea"
       >
         <span class="navigation__glyph navigation__glyph--line" aria-hidden="true"></span>
@@ -58,6 +65,7 @@
           line: filters().lineId,
         }"
         routerLinkActive="navigation__link--active"
+        ariaCurrentWhenActive="page"
         title="Alertas"
       >
         <span class="navigation__glyph navigation__glyph--alerts" aria-hidden="true"></span>
@@ -65,11 +73,11 @@
       </a>
     </nav>
 
-    <div class="system-state" role="status">
+    <div class="system-state" role="status" [attr.data-tone]="connectionStatus().tone">
       <span class="system-state__indicator" aria-hidden="true"></span>
       <span class="system-state__copy">
-        <strong>Sistema operativo</strong>
-        <small>Mock API preparada</small>
+        <strong>{{ connectionStatus().label }}</strong>
+        <small>{{ connectionStatus().detail }}</small>
       </span>
     </div>
   </aside>
@@ -83,11 +91,21 @@
       <div class="topbar__metadata" aria-label="Contexto operativo">
         <span><small>Planta</small> Norte</span>
         <span><small>Turno</small> {{ shiftName() }}</span>
-        <span class="topbar__live"><i aria-hidden="true"></i> Lectura preparada</span>
+        <button
+          class="density-toggle"
+          type="button"
+          [attr.aria-pressed]="preferences().density === 'compact'"
+          (click)="toggleDensity()"
+        >
+          Densidad {{ preferences().density === 'compact' ? 'compacta' : 'cómoda' }}
+        </button>
+        <span class="topbar__live" [attr.data-tone]="connectionStatus().tone"
+          ><i aria-hidden="true"></i> {{ connectionStatus().label }}</span
+        >
       </div>
     </header>
 
-    <main id="main-content" class="shell__content" tabindex="-1">
+    <main #mainContent id="main-content" class="shell__content" tabindex="-1">
       <router-outlet />
     </main>
   </section>

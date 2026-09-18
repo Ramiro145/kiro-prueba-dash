@@ -43,6 +43,13 @@ describe('mockApiInterceptor', () => {
     });
   });
 
+  it('aligns timestamps with the selected shift while preserving durations', async () => {
+    const overview = await firstValueFrom(api.getOverview('plant-north', 'afternoon'));
+
+    expect(overview.trend[0].timestamp).toContain('T15:00:00.000Z');
+    expect(overview.updatedAt).toContain('T20:00:00.000Z');
+  });
+
   it('returns an HTTP 404 for an unknown plant', async () => {
     await expect(firstValueFrom(api.getOverview('missing', 'morning'))).rejects.toMatchObject({
       status: 404,

@@ -5,6 +5,11 @@ import { provideRouterStore, routerReducer } from '@ngrx/router-store';
 import { provideStore } from '@ngrx/store';
 import { App } from './app';
 import { routes } from './app.routes';
+import { ALERTS_FEATURE_KEY, alertsReducer } from './domains/alerts/state/alerts.reducer';
+import {
+  LINE_DETAIL_FEATURE_KEY,
+  lineDetailReducer,
+} from './domains/operations/state/line-detail.reducer';
 import {
   OPERATIONS_FEATURE_KEY,
   operationsReducer,
@@ -23,7 +28,9 @@ describe('App', () => {
         provideRouterStore(),
         provideStore({
           router: routerReducer,
+          [ALERTS_FEATURE_KEY]: alertsReducer,
           [OPERATIONS_FEATURE_KEY]: operationsReducer,
+          [LINE_DETAIL_FEATURE_KEY]: lineDetailReducer,
           [PREFERENCES_FEATURE_KEY]: preferencesReducer,
         }),
       ],

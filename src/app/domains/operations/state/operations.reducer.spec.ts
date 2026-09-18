@@ -91,6 +91,16 @@ describe('operationsReducer', () => {
     expect(result.error).toBe('Servicio no disponible');
   });
 
+  it('clears transient loading flags when overview is left', () => {
+    const result = operationsReducer(
+      { ...initialOperationsState, activeContext: morning, refreshing: true },
+      OperationsActions.leaveOverview(),
+    );
+
+    expect(result.refreshing).toBe(false);
+    expect(result.loading).toBe(false);
+  });
+
   it('ignores a late result from an obsolete context', () => {
     const state = { ...initialOperationsState, activeContext: night, loading: true };
 

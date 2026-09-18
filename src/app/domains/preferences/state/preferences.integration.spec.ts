@@ -20,6 +20,7 @@ describe('preferences store flow', () => {
     });
     const store = TestBed.inject(Store);
 
+    TestBed.tick();
     store.dispatch(PreferencesActions.hydrate());
     TestBed.tick();
     store.dispatch(PreferencesActions.toggleNavigation());

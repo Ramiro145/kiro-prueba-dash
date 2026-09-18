@@ -33,18 +33,19 @@ describe('OverviewLifecycleEffects', () => {
 
   afterEach(() => subscription?.unsubscribe());
 
-  it('emits one deduplicated data context when overview is entered repeatedly', () => {
+  it('deduplicates a stay and emits the context again after re-entering overview', () => {
     const emitted: Action[] = [];
     subscription = effects.contextChanges$.subscribe((action) => emitted.push(action));
 
     actions.next(OperationsActions.enterOverview());
     actions.next(OperationsActions.enterOverview());
+    actions.next(OperationsActions.leaveOverview());
+    actions.next(OperationsActions.enterOverview());
 
-    expect(emitted).toEqual([
-      OperationsActions.setOverviewContext({
-        context: { plantId: 'plant-north', shiftId: 'morning' },
-      }),
-    ]);
+    const expected = OperationsActions.setOverviewContext({
+      context: { plantId: 'plant-north', shiftId: 'morning' },
+    });
+    expect(emitted).toEqual([expected, expected]);
   });
 
   it('writes selected filters to the URL', () => {

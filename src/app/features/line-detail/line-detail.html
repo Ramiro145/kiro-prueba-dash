@@ -1,4 +1,4 @@
-<main class="line-detail">
+<div class="line-detail">
   <a
     class="line-detail__back"
     data-testid="back-to-overview"
@@ -34,6 +34,18 @@
         <button type="button" (click)="retry()">Reintentar consulta</button>
       </div>
     </section>
+  } @else if (viewModel().status === 'empty') {
+    <section class="detail-state" role="status">
+      <span class="detail-state__code" aria-hidden="true">0</span>
+      <div>
+        <h1>{{ viewModel().lineName }}</h1>
+        <strong>Sin datos operativos para este turno</strong>
+        <p>
+          La línea existe, pero no reporta métricas, producción ni eventos en el contexto
+          seleccionado.
+        </p>
+      </div>
+    </section>
   } @else {
     <header class="line-header">
       <div>
@@ -65,26 +77,38 @@
           <p>Ritmo de línea</p>
           <h2>Producción por hora</h2>
         </header>
-        <div class="table-scroll">
-          <table>
-            <thead>
-              <tr>
-                <th>Hora</th>
-                <th>Real</th>
-                <th>Meta</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (point of viewModel().productionByHour; track point.hour) {
+        @if (viewModel().productionByHour.length) {
+          <div
+            class="table-scroll"
+            tabindex="0"
+            role="region"
+            aria-label="Producción por hora; desplázate horizontalmente para ver todas las columnas"
+          >
+            <table>
+              <caption class="visually-hidden">
+                Producción real y meta por hora
+              </caption>
+              <thead>
                 <tr>
-                  <th>{{ point.hour }}</th>
-                  <td>{{ point.actual }}</td>
-                  <td>{{ point.target }}</td>
+                  <th scope="col">Hora</th>
+                  <th scope="col">Real</th>
+                  <th scope="col">Meta</th>
                 </tr>
-              }
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                @for (point of viewModel().productionByHour; track point.hour) {
+                  <tr>
+                    <th scope="row">{{ point.hour }}</th>
+                    <td>{{ point.actual }}</td>
+                    <td>{{ point.target }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        } @else {
+          <p class="panel-empty">Sin producción horaria disponible.</p>
+        }
       </article>
 
       <article class="detail-panel">
@@ -92,17 +116,21 @@
           <p>Secuencia del turno</p>
           <h2>Estado de línea</h2>
         </header>
-        <ol class="status-timeline">
-          @for (interval of viewModel().statusTimeline; track interval.startedAt) {
-            <li [attr.data-status]="interval.status">
-              <i aria-hidden="true"></i>
-              <span
-                ><strong>{{ interval.statusLabel }}</strong
-                ><small>{{ interval.startedAt }}–{{ interval.endedAt }}</small></span
-              >
-            </li>
-          }
-        </ol>
+        @if (viewModel().statusTimeline.length) {
+          <ol class="status-timeline">
+            @for (interval of viewModel().statusTimeline; track interval.startedAt) {
+              <li [attr.data-status]="interval.status">
+                <i aria-hidden="true"></i>
+                <span
+                  ><strong>{{ interval.statusLabel }}</strong
+                  ><small>{{ interval.startedAt }}–{{ interval.endedAt }}</small></span
+                >
+              </li>
+            }
+          </ol>
+        } @else {
+          <p class="panel-empty">Sin secuencia de estados disponible.</p>
+        }
       </article>
 
       <article class="detail-panel">
@@ -167,4 +195,4 @@
       </article>
     </section>
   }
-</main>
+</div>

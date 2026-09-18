@@ -7,14 +7,16 @@ import { distinctUntilChanged, filter, map, merge, tap, withLatestFrom } from 'r
 import { DashboardFilters, selectDashboardFilters } from './dashboard-filters.selectors';
 import { OperationsActions, OverviewContext } from './operations.actions';
 
+type ContextAction = ReturnType<typeof OperationsActions.setOverviewContext>;
+
 @Injectable()
 export class OverviewLifecycleEffects {
   private readonly actions = inject(Actions);
   private readonly store = inject(Store);
   private readonly router = inject(Router);
 
-  readonly contextChanges$ = createEffect(() =>
-    merge(
+  readonly contextChanges$ = createEffect(() => {
+    const contextTriggers = merge(
       this.actions.pipe(ofType(OperationsActions.enterOverview)),
       this.actions.pipe(
         ofType(routerNavigatedAction),
@@ -23,13 +25,27 @@ export class OverviewLifecycleEffects {
     ).pipe(
       withLatestFrom(this.store.select(selectDashboardFilters)),
       map(([, filters]) => this.contextAction(filters)),
-      distinctUntilChanged(
-        (previous, current) =>
-          previous.context.plantId === current.context.plantId &&
-          previous.context.shiftId === current.context.shiftId,
+    );
+
+    return merge(
+      contextTriggers,
+      this.actions.pipe(
+        ofType(OperationsActions.leaveOverview),
+        map((): null => null),
       ),
-    ),
-  );
+    ).pipe(
+      distinctUntilChanged((previous, current) => {
+        if (previous === null || current === null) {
+          return previous === current;
+        }
+        return (
+          previous.context.plantId === current.context.plantId &&
+          previous.context.shiftId === current.context.shiftId
+        );
+      }),
+      filter((action): action is ContextAction => action !== null),
+    );
+  });
 
   readonly initializeFilterUrl$ = createEffect(
     () =>
@@ -50,7 +66,7 @@ export class OverviewLifecycleEffects {
     { dispatch: false },
   );
 
-  private contextAction(filters: DashboardFilters) {
+  private contextAction(filters: DashboardFilters): ContextAction {
     const context: OverviewContext = {
       plantId: filters.plantId,
       shiftId: filters.shiftId,

@@ -51,6 +51,20 @@ describe('overview chart options', () => {
     );
   });
 
+  it('does not reinterpret a partially unknown production series as zero', () => {
+    const charts = createOverviewChartModels({
+      ...analytics,
+      productionByHour: analytics.productionByHour.map((point) => ({
+        ...point,
+        targetUnits: null,
+      })),
+    });
+
+    expect(charts.production.summary).toBe(
+      'Producción acumulada: 1,562 unidades; meta no disponible.',
+    );
+  });
+
   it('does not reinterpret unknown production values as zero', () => {
     const charts = createOverviewChartModels({
       ...analytics,

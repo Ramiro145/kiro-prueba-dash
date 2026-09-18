@@ -8,6 +8,7 @@ import {
 } from '../../domains/operations/state/dashboard-filters.selectors';
 import { PreferencesActions } from '../../domains/preferences/state/preferences.actions';
 import { selectPreferences } from '../../domains/preferences/state/preferences.selectors';
+import { selectShellConnectionStatus } from './app-shell.selectors';
 import { AppShell } from './app-shell';
 
 describe('AppShell', () => {
@@ -22,6 +23,14 @@ describe('AppShell', () => {
         provideMockStore({
           selectors: [
             { selector: selectPreferences, value: preferences },
+            {
+              selector: selectShellConnectionStatus,
+              value: {
+                tone: 'stable',
+                label: 'Sistema operativo',
+                detail: 'Contexto sincronizado',
+              },
+            },
             { selector: selectDashboardFilters, value: DEFAULT_DASHBOARD_FILTERS },
           ],
         }),
@@ -57,5 +66,9 @@ describe('AppShell', () => {
 
     toggle?.click();
     expect(dispatch).toHaveBeenCalledWith(PreferencesActions.toggleNavigation());
+
+    element.querySelector<HTMLButtonElement>('.density-toggle')?.click();
+    expect(dispatch).toHaveBeenCalledWith(PreferencesActions.setDensity({ density: 'compact' }));
+    expect(toggle?.getAttribute('aria-controls')).toBe('navigation-panel');
   });
 });

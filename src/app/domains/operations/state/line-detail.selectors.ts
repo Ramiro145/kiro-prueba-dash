@@ -14,7 +14,7 @@ export interface LineDetailContext {
   readonly shiftId: string;
 }
 
-export type LineDetailViewStatus = 'idle' | 'loading' | 'ready' | 'notFound' | 'error';
+export type LineDetailViewStatus = 'idle' | 'loading' | 'ready' | 'empty' | 'notFound' | 'error';
 
 export interface LineDetailViewModel {
   readonly status: LineDetailViewStatus;
@@ -93,8 +93,22 @@ export const selectLineDetailViewModel = createSelector(
   selectLineDetailState,
   (state): LineDetailViewModel => {
     const detail = state.data;
+    const hasNoOperationalData =
+      detail !== null &&
+      Object.values(detail.metrics).every((value) => value === null) &&
+      detail.snapshot.producedUnits === null &&
+      detail.snapshot.targetUnits === null &&
+      detail.productionByHour.every(
+        ({ actualUnits, targetUnits }) => actualUnits === null && targetUnits === null,
+      ) &&
+      detail.statusTimeline.every(({ status }) => status === 'noData') &&
+      detail.downtimeEvents.length === 0 &&
+      detail.qualityDefects.length === 0 &&
+      detail.events.length === 0;
     const status: LineDetailViewStatus = detail
-      ? 'ready'
+      ? hasNoOperationalData
+        ? 'empty'
+        : 'ready'
       : state.loading
         ? 'loading'
         : state.errorKind === 'notFound'

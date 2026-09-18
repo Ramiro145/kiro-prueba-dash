@@ -8,6 +8,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test:ci": "ng test --no-watch --no-progress",
+    "typecheck": "tsc -p tsconfig.app.json --noEmit",
     "format:check": "prettier . --check"
   },
   "private": true,
@@ -18,7 +19,6 @@
     "@angular/compiler": "22.1.7",
     "@angular/core": "22.1.7",
     "@angular/forms": "22.1.7",
-    "@angular/material": "22.1.7",
     "@angular/platform-browser": "22.1.7",
     "@angular/router": "22.1.7",
     "@fontsource/ibm-plex-sans": "5.3.0",

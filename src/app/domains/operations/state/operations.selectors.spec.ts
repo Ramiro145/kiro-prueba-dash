@@ -31,6 +31,7 @@ describe('operations selectors', () => {
     expect(viewModel.status).toBe('ready');
     expect(viewModel.plantName).toBe('Planta Norte');
     expect(viewModel.location).toBe('Monterrey, NL');
+    expect(viewModel.activeAlertCount).toBe(4);
     expect(viewModel.lines[0]).toMatchObject({ stageName: 'Corte', status: 'operational' });
     expect(viewModel.kpis.map(({ id, value }) => ({ id, value }))).toEqual([
       { id: 'oee', value: '78.0%' },

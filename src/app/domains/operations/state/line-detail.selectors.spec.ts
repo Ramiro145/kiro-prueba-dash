@@ -54,6 +54,42 @@ describe('line detail selectors', () => {
     expect(viewModel.kpis.find(({ id }) => id === 'oee')?.value).toBe('—');
   });
 
+  it('returns empty for a valid line without operational measurements', () => {
+    const viewModel = selectLineDetailViewModel.projector({
+      ...initialLineDetailState,
+      data: {
+        ...WELDING_LINE_DETAIL,
+        line: { ...WELDING_LINE_DETAIL.line, status: 'noData' },
+        metrics: { oee: null, availability: null, performance: null, quality: null },
+        snapshot: {
+          ...WELDING_LINE_DETAIL.snapshot,
+          producedUnits: null,
+          targetUnits: null,
+          goodUnits: null,
+          scrapUnits: null,
+          downtimeMinutes: null,
+        },
+        productionByHour: WELDING_LINE_DETAIL.productionByHour.map((point) => ({
+          ...point,
+          actualUnits: null,
+          targetUnits: null,
+        })),
+        statusTimeline: [
+          {
+            status: 'noData',
+            startedAt: '2026-09-18T06:00:00.000Z',
+            endedAt: null,
+          },
+        ],
+        downtimeEvents: [],
+        qualityDefects: [],
+        events: [],
+      },
+    });
+
+    expect(viewModel.status).toBe('empty');
+  });
+
   it('returns a dedicated not-found model', () => {
     const viewModel = selectLineDetailViewModel.projector({
       ...initialLineDetailState,

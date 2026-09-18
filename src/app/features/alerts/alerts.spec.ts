@@ -3,9 +3,10 @@ import { provideRouter } from '@angular/router';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { vi } from 'vitest';
 import { AlertsActions } from '../../domains/alerts/state/alerts.actions';
+import { OperationsActions } from '../../domains/operations/state/operations.actions';
 import {
   AlertsViewModel,
-  selectAlertsViewModel,
+  selectDashboardAlertsViewModel,
 } from '../../domains/alerts/state/alerts.selectors';
 import {
   DEFAULT_DASHBOARD_FILTERS,
@@ -35,6 +36,7 @@ const readyViewModel: AlertsViewModel = {
       statusLabel: 'Activa',
       lineId: 'welding-01',
       lineName: 'Soldadura 01',
+      plantName: 'Planta Norte',
       message: 'Temperatura fuera de rango',
       startedAt: '10:48',
       durationLabel: '72 min',
@@ -52,7 +54,7 @@ describe('Alerts', () => {
         provideRouter([]),
         provideMockStore({
           selectors: [
-            { selector: selectAlertsViewModel, value: readyViewModel },
+            { selector: selectDashboardAlertsViewModel, value: readyViewModel },
             { selector: selectDashboardFilters, value: DEFAULT_DASHBOARD_FILTERS },
           ],
         }),
@@ -72,6 +74,7 @@ describe('Alerts', () => {
     );
     expect(element.querySelector('h1')?.textContent).toContain('Centro de alertas');
     expect(element.textContent).toContain('Temperatura fuera de rango');
+    expect(element.textContent).toContain('Planta Norte');
     expect(element.textContent).toContain('4 activas');
   });
 
@@ -91,13 +94,26 @@ describe('Alerts', () => {
         filters: { severity: 'critical', status: 'all', lineId: null },
       }),
     );
+
+    const line = element.querySelector<HTMLSelectElement>('[data-testid="line-filter"]');
+    line!.value = 'welding-01';
+    line!.dispatchEvent(new Event('change'));
+    expect(dispatch).toHaveBeenCalledWith(
+      OperationsActions.updateFilters({
+        filters: {
+          ...DEFAULT_DASHBOARD_FILTERS,
+          lineId: 'welding-01',
+        },
+      }),
+    );
+
     expect(link?.getAttribute('href')).toBe(
       '/lines/welding-01?plant=plant-north&shift=morning&line=welding-01',
     );
   });
 
   it('renders empty and error states', () => {
-    store.overrideSelector(selectAlertsViewModel, {
+    store.overrideSelector(selectDashboardAlertsViewModel, {
       ...readyViewModel,
       status: 'empty',
       alerts: [],
@@ -108,7 +124,7 @@ describe('Alerts', () => {
       'No hay alertas para estos filtros',
     );
 
-    store.overrideSelector(selectAlertsViewModel, {
+    store.overrideSelector(selectDashboardAlertsViewModel, {
       ...readyViewModel,
       status: 'error',
       alerts: [],

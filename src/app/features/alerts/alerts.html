@@ -1,24 +1,26 @@
-<main class="alerts-page">
+<div class="alerts-page">
   <header class="alerts-header">
     <div>
       <p>Supervisión de incidencias</p>
       <h1>Centro de alertas</h1>
       <span>Consulta operativa · sin acciones de reconocimiento</span>
     </div>
-    <dl class="alerts-summary" aria-label="Resumen de alertas">
-      <div>
-        <dt>Total</dt>
-        <dd>{{ viewModel().totalCount }}</dd>
-      </div>
-      <div>
-        <dt>Activas</dt>
-        <dd>{{ viewModel().activeCount }}</dd>
-      </div>
-      <div data-tone="critical">
-        <dt>Críticas</dt>
-        <dd>{{ viewModel().criticalCount }}</dd>
-      </div>
-    </dl>
+    @if (viewModel().status === 'ready' || viewModel().status === 'empty') {
+      <dl class="alerts-summary" aria-label="Resumen de alertas">
+        <div>
+          <dt>Total</dt>
+          <dd>{{ viewModel().totalCount }}</dd>
+        </div>
+        <div>
+          <dt>Activas</dt>
+          <dd>{{ viewModel().activeCount }}</dd>
+        </div>
+        <div data-tone="critical">
+          <dt>Críticas</dt>
+          <dd>{{ viewModel().criticalCount }}</dd>
+        </div>
+      </dl>
+    }
   </header>
 
   <section class="alert-filters" aria-label="Filtros de alertas">
@@ -48,7 +50,11 @@
     </label>
     <label>
       <span>Línea</span>
-      <select [value]="viewModel().filters.lineId ?? ''" (change)="changeLine($event)">
+      <select
+        data-testid="line-filter"
+        [value]="viewModel().filters.lineId ?? ''"
+        (change)="changeLine($event)"
+      >
         <option value="">Todas las líneas</option>
         @for (line of viewModel().lineOptions; track line.id) {
           <option [value]="line.id">{{ line.name }}</option>
@@ -93,17 +99,26 @@
           ><strong>{{ viewModel().activeCount }}</strong> activas</span
         >
       </header>
-      <div class="alerts-table__scroll">
+      <div
+        class="alerts-table__scroll"
+        tabindex="0"
+        role="region"
+        aria-label="Tabla de incidencias; desplázate horizontalmente para ver todas las columnas"
+      >
         <table>
+          <caption class="visually-hidden">
+            Alertas industriales ordenadas por severidad y antigüedad
+          </caption>
           <thead>
             <tr>
-              <th>Severidad</th>
-              <th>Estado</th>
-              <th>Línea</th>
-              <th>Incidencia</th>
-              <th>Inicio</th>
-              <th>Duración</th>
-              <th><span class="visually-hidden">Acción</span></th>
+              <th scope="col">Severidad</th>
+              <th scope="col">Estado</th>
+              <th scope="col">Planta</th>
+              <th scope="col">Línea</th>
+              <th scope="col">Incidencia</th>
+              <th scope="col">Inicio</th>
+              <th scope="col">Duración</th>
+              <th scope="col"><span class="visually-hidden">Acción</span></th>
             </tr>
           </thead>
           <tbody>
@@ -117,9 +132,10 @@
                     alert.statusLabel
                   }}</span>
                 </td>
-                <td>
+                <td>{{ alert.plantName }}</td>
+                <th scope="row">
                   <strong>{{ alert.lineName }}</strong>
-                </td>
+                </th>
                 <td class="alerts-table__message">{{ alert.message }}</td>
                 <td>{{ alert.startedAt }}</td>
                 <td>{{ alert.durationLabel }}</td>
@@ -149,4 +165,4 @@
       </footer>
     </section>
   }
-</main>
+</div>

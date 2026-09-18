@@ -38,7 +38,7 @@
 
 - Angular `22.1.7` con componentes standalone, TypeScript estricto y lazy loading.
 - NgRx `22.0.1` mediante `@ngrx/store`, `@ngrx/effects`, `@ngrx/entity`, `@ngrx/router-store` y `@ngrx/store-devtools`.
-- Angular Material/CDK `22.1.7`, usando componentes accesibles seleccionados y una identidad visual propia.
+- Angular CDK `22.1.7` para foco y utilidades accesibles, con componentes visuales propios.
 - Apache ECharts `6.1.0`, integrado directamente mediante un adaptador Angular e imports modulares.
 - Vitest como framework de pruebas predeterminado de Angular 22.
 - Dependencias instaladas con versiones exactas y archivo de bloqueo conservado.
@@ -280,7 +280,7 @@ Los paneles utilizan bordes funcionales, esquinas mínimas y casi ninguna sombra
 ### 1. Crear la base ejecutable y verificable de Angular 22
 
 - Generar una aplicación standalone con routing, SCSS, TypeScript estricto y Vitest.
-- Fijar Angular `22.1.7`, Angular Material/CDK `22.1.7`, NgRx `22.0.1` y ECharts `6.1.0`.
+- Fijar Angular `22.1.7`, Angular CDK `22.1.7`, NgRx `22.0.1` y ECharts `6.1.0`.
 - Configurar scripts de build, test y análisis estático.
 - Crear rutas iniciales con redirección a `/overview`.
 - Probar el arranque y la redirección predeterminada.
@@ -350,22 +350,24 @@ Los paneles utilizan bordes funcionales, esquinas mínimas y casi ninguna sombra
 
 ## Criterios de aceptación
 
-- [ ] La aplicación utiliza Angular `22.1.7` y NgRx `22.0.1` con versiones exactas.
-- [ ] Las tres vistas funcionan mediante rutas lazy-loaded.
-- [ ] El resumen muestra todos los indicadores OEE acordados.
-- [ ] Los filtros actualizan la URL y sobreviven a una recarga.
-- [ ] Los datos se actualizan cada 30 segundos sin solicitudes solapadas.
-- [ ] Un error de refresco conserva y marca el último dato válido.
-- [ ] Las preferencias visuales se restauran desde `localStorage`.
-- [ ] Todas las vistas presentan estados de carga, vacío y error.
-- [ ] Las alertas y líneas permiten navegación contextual.
+- [x] La aplicación utiliza Angular `22.1.7` y NgRx `22.0.1` con versiones exactas.
+- [x] Las tres vistas funcionan mediante rutas lazy-loaded.
+- [x] El resumen muestra todos los indicadores OEE acordados.
+- [x] Los filtros actualizan la URL y sobreviven a una recarga.
+- [x] Los datos se actualizan cada 30 segundos sin solicitudes solapadas.
+- [x] Un error de refresco conserva y marca el último dato válido.
+- [x] Las preferencias visuales se restauran desde `localStorage`.
+- [x] Todas las vistas presentan estados de carga, vacío y error.
+- [x] Las alertas y líneas permiten navegación contextual.
 - [ ] La aplicación no presenta desbordamiento general a 390, 768 y 1440 píxeles.
-- [ ] Todas las acciones son operables por teclado y tienen foco visible.
-- [ ] Los gráficos ofrecen resumen textual y alternativa accesible.
-- [ ] Reducers, selectors, effects y servicios HTTP tienen pruebas de comportamiento.
+- [x] Todas las acciones son operables por teclado y tienen foco visible.
+- [x] Los gráficos ofrecen resumen textual y alternativa accesible.
+- [x] Reducers, selectors, effects y servicios HTTP tienen pruebas de comportamiento.
 - [ ] Los flujos de navegación, filtros, error y refresco tienen pruebas integradas.
-- [ ] Tests, análisis estático y build de producción finalizan correctamente.
-- [ ] El README documenta instalación, ejecución, pruebas, arquitectura y sustitución del mock.
+- [x] Tests, análisis estático y build de producción finalizan correctamente.
+- [x] El README documenta instalación, ejecución, pruebas, arquitectura y sustitución del mock.
+
+> Verificación de cierre (2026-09-18): el polling de 30 segundos y la degradación con último dato válido corresponden al resumen operativo. La estructura responsive fue auditada estáticamente para 390, 768 y 1440 píxeles; quedan pendientes la inspección visual manual en navegador y flujos integrados adicionales de error/refresco, reflejados en los dos criterios sin marcar.
 
 ## Decisiones tomadas y descartadas
 

@@ -116,10 +116,16 @@ const createProductionChart = (data: OperationsAnalyticsData): OverviewChartMode
     .filter((value): value is number => value !== null);
   const actual = actualReadings.reduce((total, value) => total + value, 0);
   const target = targetReadings.reduce((total, value) => total + value, 0);
-  const hasProductionData = actualReadings.length > 0 || targetReadings.length > 0;
-  const summary = hasProductionData
-    ? `Producción acumulada: ${integerFormatter.format(actual)} unidades frente a una meta de ${integerFormatter.format(target)}.`
-    : 'Producción horaria sin datos disponibles para el turno.';
+  const hasActualData = actualReadings.length > 0;
+  const hasTargetData = targetReadings.length > 0;
+  const summary =
+    hasActualData && hasTargetData
+      ? `Producción acumulada: ${integerFormatter.format(actual)} unidades frente a una meta de ${integerFormatter.format(target)}.`
+      : hasActualData
+        ? `Producción acumulada: ${integerFormatter.format(actual)} unidades; meta no disponible.`
+        : hasTargetData
+          ? `Producción real no disponible; meta acumulada: ${integerFormatter.format(target)} unidades.`
+          : 'Producción horaria sin datos disponibles para el turno.';
   const source = [
     ['Hora', 'Real', 'Meta'],
     ...data.productionByHour.map((point) => [
