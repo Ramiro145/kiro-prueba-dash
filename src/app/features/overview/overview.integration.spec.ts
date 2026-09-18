@@ -1,5 +1,6 @@
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { provideEffects } from '@ngrx/effects';
 import { provideStore } from '@ngrx/store';
 import { vi } from 'vitest';
@@ -16,6 +17,7 @@ describe('Overview operations flow', () => {
     await TestBed.configureTestingModule({
       imports: [Overview],
       providers: [
+        provideRouter([]),
         provideHttpClient(withInterceptors([mockApiInterceptor])),
         provideStore({ [OPERATIONS_FEATURE_KEY]: operationsReducer }),
         provideEffects(OperationsEffects),
@@ -32,6 +34,8 @@ describe('Overview operations flow', () => {
         'Planta Norte',
       );
       expect(element.querySelectorAll('.process__stage')).toHaveLength(4);
+      expect(element.querySelectorAll('[data-testid="kpi-item"]')).toHaveLength(7);
+      expect(element.textContent).toContain('1,562 / 1,850');
     });
   });
 });

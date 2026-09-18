@@ -12,9 +12,10 @@ describe('operations selectors', () => {
     expect(viewModel.status).toBe('loading');
     expect(viewModel.plantName).toBeNull();
     expect(viewModel.lines).toEqual([]);
+    expect(viewModel.kpis).toEqual([]);
   });
 
-  it('maps API data to an operational view model', () => {
+  it('maps API data to an operational view model with seven KPIs', () => {
     const viewModel = selectOperationsViewModel.projector({
       ...initialOperationsState,
       data: NORTH_PLANT_OVERVIEW,
@@ -25,6 +26,41 @@ describe('operations selectors', () => {
     expect(viewModel.plantName).toBe('Planta Norte');
     expect(viewModel.location).toBe('Monterrey, NL');
     expect(viewModel.lines[0]).toMatchObject({ stageName: 'Corte', status: 'operational' });
+    expect(viewModel.kpis.map(({ id, value }) => ({ id, value }))).toEqual([
+      { id: 'oee', value: '78.0%' },
+      { id: 'availability', value: '84.0%' },
+      { id: 'performance', value: '95.0%' },
+      { id: 'quality', value: '98.0%' },
+      { id: 'production', value: '1,562 / 1,850' },
+      { id: 'scrap', value: '1.9%' },
+      { id: 'downtime', value: '135 min' },
+    ]);
+  });
+
+  it('represents unavailable metrics safely and protects division by zero', () => {
+    const viewModel = selectOperationsViewModel.projector({
+      ...initialOperationsState,
+      data: {
+        ...NORTH_PLANT_OVERVIEW,
+        metrics: { oee: null, availability: null, performance: null, quality: null },
+        snapshot: {
+          ...NORTH_PLANT_OVERVIEW.snapshot,
+          producedUnits: 0,
+          targetUnits: 0,
+          goodUnits: 0,
+          scrapUnits: 0,
+          downtimeMinutes: null,
+        },
+      },
+    });
+
+    expect(viewModel.kpis.find(({ id }) => id === 'oee')?.value).toBe('—');
+    expect(viewModel.kpis.find(({ id }) => id === 'production')?.supportingText).toBe(
+      'Meta no disponible',
+    );
+    expect(viewModel.kpis.find(({ id }) => id === 'scrap')?.value).toBe('—');
+    expect(viewModel.kpis.find(({ id }) => id === 'downtime')?.value).toBe('—');
+    expect(viewModel.kpis.map(({ value }) => value).join(' ')).not.toMatch(/NaN|Infinity/);
   });
 
   it('returns an error view model when the initial request fails', () => {

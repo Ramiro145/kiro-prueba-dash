@@ -34,6 +34,8 @@
       </div>
     </section>
   } @else {
+    <app-kpi-band [items]="viewModel().kpis" />
+
     <section class="process" aria-labelledby="process-title">
       <header class="process__header">
         <div>
@@ -50,14 +52,23 @@
 
       <ol class="process__stages">
         @for (line of viewModel().lines; track line.id) {
-          <li class="process__stage" [attr.data-status]="line.status">
-            <span class="process__indicator" aria-hidden="true"></span>
-            <span class="process__code" aria-hidden="true">0{{ $index + 1 }}</span>
-            <span class="process__line">
-              <strong>{{ line.stageName }}</strong>
-              <small>{{ line.name }}</small>
-            </span>
-            <span class="process__status">{{ statusLabel(line.status) }}</span>
+          <li>
+            <a
+              class="process__stage"
+              [attr.data-status]="line.status"
+              [attr.aria-label]="
+                'Ver detalle de ' + line.name + ', estado ' + statusLabel(line.status)
+              "
+              [routerLink]="['/lines', line.id]"
+            >
+              <span class="process__indicator" aria-hidden="true"></span>
+              <span class="process__code" aria-hidden="true">0{{ $index + 1 }}</span>
+              <span class="process__line">
+                <strong>{{ line.stageName }}</strong>
+                <small>{{ line.name }}</small>
+              </span>
+              <span class="process__status">{{ statusLabel(line.status) }}</span>
+            </a>
           </li>
         }
       </ol>

@@ -1,9 +1,11 @@
 import { DatePipe } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
+import { LineStatus } from '../../domains/operations/models/operations.models';
 import { OperationsActions } from '../../domains/operations/state/operations.actions';
 import { selectOperationsViewModel } from '../../domains/operations/state/operations.selectors';
-import { LineStatus } from '../../domains/operations/models/operations.models';
+import { KpiBand } from '../../shared/ui/kpi-band/kpi-band';
 
 const DEFAULT_PLANT_ID = 'plant-north';
 const DEFAULT_SHIFT_ID = 'morning';
@@ -16,7 +18,7 @@ const STATUS_LABELS: Record<LineStatus, string> = {
 };
 
 @Component({
-  imports: [DatePipe],
+  imports: [DatePipe, KpiBand, RouterLink],
   selector: 'app-overview',
   templateUrl: './overview.html',
   styleUrl: './overview.scss',

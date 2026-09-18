@@ -1,0 +1,21 @@
+<section class="kpi-band" aria-labelledby="kpi-band-title">
+  <header class="kpi-band__header">
+    <p>Indicadores del turno</p>
+    <h2 id="kpi-band-title">Pulso operativo</h2>
+  </header>
+
+  <dl class="kpi-band__metrics">
+    @for (item of items(); track item.id) {
+      <div class="kpi-band__item" data-testid="kpi-item" [attr.data-tone]="item.tone">
+        <dt>
+          <span class="kpi-band__indicator" aria-hidden="true"></span>
+          {{ item.label }}
+        </dt>
+        <dd>
+          <strong>{{ item.value }}</strong>
+          <small>{{ item.supportingText }}</small>
+        </dd>
+      </div>
+    }
+  </dl>
+</section>
